@@ -223,12 +223,14 @@ public interface IResult<TData> : IEquatable<IResult<TData>> where TData : notnu
     /// Executes an action only if the <see cref="IResult{TData}" /> is successful.
     /// </summary>
     /// <param name="action">The action to execute.</param>
+    /// <returns>This result.</returns>
     IResult<TData> OnSuccess(Action<TData> action);
 
     /// <summary>
     /// Executes an action only if the <see cref="IResult{TData}" /> has failed.
     /// </summary>
     /// <param name="action">The action to execute.</param>
+    /// <returns>This result.</returns>
     IResult<TData> OnFailure(Action<Exception> action);
 
     /// <summary>

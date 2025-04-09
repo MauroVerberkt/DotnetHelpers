@@ -340,7 +340,8 @@ public class ResultTests
         var actionExecuted = false;
 
         // Act
-        successResult.OnSuccess(Action);
+        successResult.OnSuccess(Action)
+            .OnSuccess(Action);
 
         // Assert
         Assert.That(actionExecuted, Is.True);
@@ -386,7 +387,8 @@ public class ResultTests
         var actionExecuted = false;
 
         // Act
-        successResult.OnFailure(Action);
+        successResult.OnFailure(Action)
+            .OnFailure(Action);
 
         // Assert
         Assert.That(actionExecuted, Is.True);
