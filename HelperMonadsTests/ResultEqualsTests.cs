@@ -32,7 +32,7 @@ public class ResultEqualsTests
     public void Equals_ShouldReturnTrue_WhenResultsAreEqual()
     {
         // Arrange
-        IResult<string> result1 = Result<string>.Success(SuccessMessage);
+        var result1 = Result<string>.Success(SuccessMessage);
         object result2 = Result<string>.Success(SuccessMessage);
 
         // Act
@@ -49,8 +49,8 @@ public class ResultEqualsTests
     public void Equals_ShouldReturnFalse_WhenResultsAreNotEqual()
     {
         // Arrange
-        IResult<string> result1 = Result<string>.Success(SuccessMessage);
-        IResult<string> result2 = Result<string>.Failure(TestException);
+        var result1 = Result<string>.Success(SuccessMessage);
+        var result2 = Result<string>.Failure(TestException);
 
         // Act
         var isEqual = result1.Equals(result2);

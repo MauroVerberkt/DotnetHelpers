@@ -25,15 +25,18 @@ public class OptionTests
     public void Some_ShouldContainValue()
     {
         // Arrange
-        IOption<string> option = Option<string>.Some(ValidValue);
+        var option = Option<string>.Some(ValidValue);
 
         // Act
         var hasValue = option.HasValue;
         var optionValue = option.Value;
 
-        // Assert
-        Assert.That(hasValue, Is.True);
-        Assert.That(optionValue, Is.EqualTo(ValidValue));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(hasValue, Is.True);
+            Assert.That(optionValue, Is.EqualTo(ValidValue));
+        });
     }
 
     /// <summary>
@@ -43,7 +46,7 @@ public class OptionTests
     public void None_ShouldNotContainValue()
     {
         // Arrange
-        IOption<string> option = Option<string>.None;
+        var option = Option<string>.None;
 
         // Act
         var hasValue = option.HasValue;
@@ -60,7 +63,7 @@ public class OptionTests
     public void Match_ShouldReturnSome_WhenOptionIsSome()
     {
         // Arrange
-        IOption<string> option = Option<string>.Some(ValidValue);
+        var option = Option<string>.Some(ValidValue);
 
         // Act
         var result = option.Match(SomeFunc, NoneFunc);
@@ -78,7 +81,7 @@ public class OptionTests
     public void Match_ShouldReturnNone_WhenOptionIsNone()
     {
         // Arrange
-        IOption<string> option = Option<string>.None;
+        var option = Option<string>.None;
 
         // Act
         var result = option.Match(SomeFunc, NoneFunc);
@@ -97,7 +100,7 @@ public class OptionTests
     public async Task MatchAsync_ShouldReturnSome_WhenOptionIsSome()
     {
         // Arrange
-        IOption<string> option = Option<string>.Some(ValidValue);
+        var option = Option<string>.Some(ValidValue);
 
         // Act
         var result = await option.MatchAsync(AsyncSomeFunc, AsyncNoneFunc);
@@ -116,7 +119,7 @@ public class OptionTests
     public async Task MatchAsync_ShouldReturnNone_WhenOptionIsNone()
     {
         // Arrange
-        IOption<string> option = Option<string>.None;
+        var option = Option<string>.None;
 
         // Act
         var result = await option.MatchAsync(AsyncSomeFunc, AsyncNoneFunc);
@@ -137,7 +140,7 @@ public class OptionTests
     public async Task MatchAsync_WithCancellation_ShouldReturnSome_WhenOptionIsSome()
     {
         // Arrange
-        IOption<string> option = Option<string>.Some(ValidValue);
+        var option = Option<string>.Some(ValidValue);
 
         // Act
         var result = await option.MatchAsync(AsyncSomeFunc, AsyncNoneFunc, CancellationToken.None);
@@ -156,7 +159,7 @@ public class OptionTests
     public async Task MatchAsync_WithCancellation_ShouldReturnNone_WhenOptionIsNone()
     {
         // Arrange
-        IOption<string> option = Option<string>.None;
+        var option = Option<string>.None;
 
         // Act
         var result = await option.MatchAsync(AsyncSomeFunc, AsyncNoneFunc, CancellationToken.None);
@@ -246,11 +249,14 @@ public class OptionTests
     public void FromNullable_ShouldReturnSome_WhenValueIsNotNull()
     {
         // Act
-        IOption<string> option = Option<string>.FromNullable(ValidValue);
+        var option = Option<string>.FromNullable(ValidValue);
 
-        // Assert
-        Assert.That(option.HasValue, Is.True);
-        Assert.That(option.Value, Is.EqualTo(ValidValue));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(option.HasValue, Is.True);
+            Assert.That(option.Value, Is.EqualTo(ValidValue));
+        });
     }
 
     /// <summary>
@@ -261,7 +267,7 @@ public class OptionTests
     public void FromNullable_ShouldReturnNone_WhenValueIsNull()
     {
         // Act
-        IOption<string> option = Option<string>.FromNullable(NullValue);
+        var option = Option<string>.FromNullable(NullValue);
 
         // Assert
         Assert.That(option.HasValue, Is.False);
@@ -278,9 +284,12 @@ public class OptionTests
         // Act
         Option<string> option = ValidValue;
 
-        // Assert
-        Assert.That(option.HasValue, Is.True);
-        Assert.That(option.Value, Is.EqualTo(ValidValue));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(option.HasValue, Is.True);
+            Assert.That(option.Value, Is.EqualTo(ValidValue));
+        });
     }
 
     /// <summary>
@@ -307,7 +316,7 @@ public class OptionTests
     public void ToString_ShouldReturnSome_WhenValueIsNotNull()
     {
         // Act
-        IOption<string> option = Option<string>.FromNullable(ValidValue);
+        var option = Option<string>.FromNullable(ValidValue);
         var stringValue = option.ToString();
 
         // Assert
@@ -323,7 +332,7 @@ public class OptionTests
     public void ToString_ShouldReturnNone_WhenValueIsNotNull()
     {
         // Act
-        IOption<string> option = Option<string>.FromNullable(NullValue);
+        var option = Option<string>.FromNullable(NullValue);
         var stringValue = option.ToString();
 
         // Assert

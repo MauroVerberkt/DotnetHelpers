@@ -28,12 +28,15 @@ public class ResultTests
     public void Success_ShouldCreateSuccessResult_WithSuccessMessage()
     {
         // Act
-        IResult<string> result =  Result.Success(SuccessMessage);
+        var result =  Result.Success(SuccessMessage);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Data, Is.EqualTo(SuccessMessage));
-        Assert.That(result.Error, Is.Null);
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Data, Is.EqualTo(SuccessMessage));
+            Assert.That(result.Error, Is.Null);
+        });
     }
 
     /// <summary>
@@ -43,12 +46,15 @@ public class ResultTests
     public void Failure_ShouldCreateFailureResult_WithErrorOnly()
     {
         // Act
-        IResult<string> result = Result.Failure<string>(TestException);
+        var result = Result.Failure<string>(TestException);
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Data, Is.Null);
-        Assert.That(result.Error?.Message, Is.EqualTo(FailureMessage));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Data, Is.Null);
+            Assert.That(result.Error?.Message, Is.EqualTo(FailureMessage));
+        });
     }
 
     /// <summary>
@@ -81,14 +87,17 @@ public class ResultTests
     public void Map_ShouldReturnMappedData_WhenSuccess()
     {
         // Arrange
-        IResult<string> successResult = Result<string>.Success(SuccessMessage);
+        var successResult = Result<string>.Success(SuccessMessage);
 
         // Act
         var result = successResult.Map(data => data.ToUpper());
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Data, Is.EqualTo(SuccessMessage.ToUpper()));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Data, Is.EqualTo(SuccessMessage.ToUpper()));
+        });
     }
 
     /// <summary>
@@ -99,14 +108,17 @@ public class ResultTests
     public void Map_ShouldReturnFailure_WhenFailure()
     {
         // Arrange
-        IResult<string> failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestException);
 
         // Act
         var result = failureResult.Map(data => data.ToUpper());
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Error?.Message, Is.EqualTo(FailureMessage));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Error?.Message, Is.EqualTo(FailureMessage));
+        });
     }
 
     /// <summary>
@@ -117,14 +129,17 @@ public class ResultTests
     public async Task MapAsync_ShouldReturnMappedData_WhenSuccess()
     {
         // Arrange
-        IResult<string> successResult = Result<string>.Success(SuccessMessage);
+        var successResult = Result<string>.Success(SuccessMessage);
 
         // Act
         var result = await successResult.MapAsync(data => Task.FromResult(data.ToUpper()));
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Data, Is.EqualTo(SuccessMessage.ToUpper()));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Data, Is.EqualTo(SuccessMessage.ToUpper()));
+        });
     }
 
     /// <summary>
@@ -136,14 +151,17 @@ public class ResultTests
     public async Task MapAsync_ShouldReturnFailure_WhenFailure()
     {
         // Arrange
-        IResult<string> failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestException);
 
         // Act
         var result = await failureResult.MapAsync(data => Task.FromResult(data.ToUpper()));
 
-        // Assert
-        Assert.That(result.IsSuccess, Is.False);
-        Assert.That(result.Error?.Message, Is.EqualTo(FailureMessage));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(result.IsSuccess, Is.False);
+            Assert.That(result.Error?.Message, Is.EqualTo(FailureMessage));
+        });
     }
 
     /// <summary>
@@ -153,7 +171,7 @@ public class ResultTests
     public void ToString_ShouldReturnSuccess_WhenResultIsSuccess()
     {
         // Arrange
-        IResult<string> successResult = Result<string>.Success(SuccessMessage);
+        var successResult = Result<string>.Success(SuccessMessage);
 
         // Act
         var resultString = successResult.ToString();
@@ -169,7 +187,7 @@ public class ResultTests
     public void ToString_ShouldReturnFailure_WhenResultIsFailure()
     {
         // Arrange
-        IResult<string> failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestException);
 
         // Act
         var resultString = failureResult.ToString();
@@ -185,15 +203,18 @@ public class ResultTests
     public void Deconstruct_ShouldReturnCorrectValues()
     {
         // Arrange
-        IResult<string> successResult = Result<string>.Success(SuccessMessage);
+        var successResult = Result<string>.Success(SuccessMessage);
 
         // Act
         var (isSuccess, data, error) = successResult;
 
-        // Assert
-        Assert.That(isSuccess, Is.True);
-        Assert.That(data, Is.EqualTo(SuccessMessage));
-        Assert.That(error, Is.Null);
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(isSuccess, Is.True);
+            Assert.That(data, Is.EqualTo(SuccessMessage));
+            Assert.That(error, Is.Null);
+        });
     }
 
     /// <summary>
@@ -213,8 +234,11 @@ public class ResultTests
 
         // Assert
         Assert.That(result, Is.InstanceOf<Result<int>>());
-        Assert.That(result.IsFailure, Is.True);
-        Assert.That(result.Error, Is.InstanceOf<Exception>());
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error, Is.InstanceOf<Exception>());
+        });
         return;
 
         Task<int> Transform(string data, CancellationToken token)
@@ -232,7 +256,7 @@ public class ResultTests
     public async Task MapAsync_ShouldReturnSuccess_WhenResultIsSuccess()
     {
         // Arrange
-        IResult<string>  successResult = Result<string>.Success(SuccessMessage);
+        var  successResult = Result<string>.Success(SuccessMessage);
 
         // Act
         var result = await successResult.MapAsync((Func<string, CancellationToken, Task<int>>)Transform,
@@ -240,8 +264,11 @@ public class ResultTests
 
         // Assert
         Assert.That(result, Is.InstanceOf<Result<int>>());
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Data, Is.EqualTo(SuccessMessage.Length));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Data, Is.EqualTo(SuccessMessage.Length));
+        });
         return;
 
         Task<int> Transform(string data, CancellationToken _)
@@ -259,7 +286,7 @@ public class ResultTests
     public async Task MapAsync_ShouldReturnSuccess_WhenResultIsSuccess_WithDifferentMappedType()
     {
         // Arrange
-        IResult<string>  successResult = Result<string>.Success(SuccessMessage);
+        var  successResult = Result<string>.Success(SuccessMessage);
 
         // Act
         var result = await successResult.MapAsync((Func<string, CancellationToken, Task<string>>)Transform,
@@ -267,8 +294,11 @@ public class ResultTests
 
         // Assert
         Assert.That(result, Is.InstanceOf<Result<string>>());
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Data, Is.EqualTo(ProcessedMessage));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Data, Is.EqualTo(ProcessedMessage));
+        });
         return;
 
         Task<string> Transform(string data, CancellationToken token)
@@ -286,7 +316,7 @@ public class ResultTests
     public void MapAsync_ShouldRespectCancellation_WhenCancelled()
     {
         // Arrange
-        IResult<string>  successResult = Result<string>.Success(SuccessMessage);
+        var  successResult = Result<string>.Success(SuccessMessage);
         using var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
         Func<string, CancellationToken, Task<int>> transform = async (data, token) =>
@@ -311,7 +341,7 @@ public class ResultTests
     public async Task MapAsync_ShouldReturnMappedData_WhenMultipleTransformations()
     {
         // Arrange
-        IResult<string>  successResult = Result<string>.Success(SuccessMessage);
+        var  successResult = Result<string>.Success(SuccessMessage);
 
         // Act
         var result = await successResult.MapAsync((Func<string, CancellationToken, Task<string>>)Transform,
@@ -319,8 +349,11 @@ public class ResultTests
 
         // Assert
         Assert.That(result, Is.InstanceOf<Result<string>>());
-        Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Data, Is.EqualTo(SuccessMessage.ToUpper()));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsSuccess, Is.True);
+            Assert.That(result.Data, Is.EqualTo(SuccessMessage.ToUpper()));
+        });
         return;
 
         Task<string> Transform(string data, CancellationToken token)
@@ -336,7 +369,7 @@ public class ResultTests
     public void OnSuccess_ShouldExecuteAction_WhenResultIsSuccess()
     {
         // Arrange
-        IResult<string>  successResult = Result<string>.Success(SuccessMessage);
+        var  successResult = Result<string>.Success(SuccessMessage);
         var actionExecuted = false;
 
         // Act
@@ -360,7 +393,7 @@ public class ResultTests
     public void OnSuccess_ShouldNotExecuteAction_WhenResultIsFailure()
     {
         // Arrange
-        IResult<string> failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestException);
         var actionExecuted = false;
 
         // Act
@@ -383,7 +416,7 @@ public class ResultTests
     public void OnFailure_ShouldExecuteAction_WhenResultIsFailure()
     {
         // Arrange
-        IResult<string>  successResult = Result<string>.Failure(TestException);
+        var  successResult = Result<string>.Failure(TestException);
         var actionExecuted = false;
 
         // Act
@@ -407,7 +440,7 @@ public class ResultTests
     public void OnFailure_ShouldNotExecuteAction_WhenResultIsSuccess()
     {
         // Arrange
-        IResult<string> failureResult = Result<string>.Success(SuccessMessage);
+        var failureResult = Result<string>.Success(SuccessMessage);
         var actionExecuted = false;
 
         // Act
@@ -430,8 +463,8 @@ public class ResultTests
     public void GetHashCode_ShouldReturnSameHashCodeForEqualResults()
     {
         // Arrange
-        IResult<string>  successResult1 = Result<string>.Success(SuccessMessage);
-        IResult<string>  successResult2 = Result<string>.Success(SuccessMessage);
+        var  successResult1 = Result<string>.Success(SuccessMessage);
+        var  successResult2 = Result<string>.Success(SuccessMessage);
 
         // Act
         var hashCode1 = successResult1.GetHashCode();
@@ -448,8 +481,8 @@ public class ResultTests
     public void GetHashCode_ShouldReturnDifferentHashCodesForDifferentResults()
     {
         // Arrange
-        IResult<string>  successResult1 = Result<string>.Success(SuccessMessage);
-        IResult<string>  successResult2 = Result<string>.Failure(TestException);
+        var  successResult1 = Result<string>.Success(SuccessMessage);
+        var  successResult2 = Result<string>.Failure(TestException);
 
         // Act
         var hashCode1 = successResult1.GetHashCode();

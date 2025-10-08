@@ -11,26 +11,30 @@ namespace HelperMonads.Result;
 /// <summary>
 /// Represents the result of an operation, indicating success or failure, along with additional information.
 /// </summary>
-public class Result<TData> : IResult<TData> where TData : notnull
+public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
 {
-    /// <inheritdoc />
-    [Pure]
+    /// <summary>
+    /// Indicates whether the operation was successful.
+    /// </summary>    [Pure]
     [MemberNotNullWhen(true, nameof(Data))]
     [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; }
 
-    /// <inheritdoc />
-    [Pure]
+    /// <summary>
+    /// Indicates whether the operation failed.
+    /// </summary>    [Pure]
     [MemberNotNullWhen(true, nameof(Error))]
     [MemberNotNullWhen(false, nameof(Data))]
     public bool IsFailure => !IsSuccess;
 
-    /// <inheritdoc />
-    [Pure]
+    /// <summary>
+    /// Data associated with the <see cref="Result{TData}" />.
+    /// </summary>    [Pure]
     public TData? Data { get; }
 
-    /// <inheritdoc />
-    [Pure]
+    /// <summary>
+    /// The exception associated with a failed operation.
+    /// </summary>    [Pure]
     public Exception? Error { get; }
 
     /// <summary>
@@ -73,7 +77,7 @@ public class Result<TData> : IResult<TData> where TData : notnull
 
     /// <inheritdoc />
     [Pure]
-    public bool Equals(IResult<TData>? other)
+    public bool Equals(Result<TData>? other)
     {
         return other != null &&
                IsSuccess == other.IsSuccess &&
@@ -81,38 +85,91 @@ public class Result<TData> : IResult<TData> where TData : notnull
                EqualityComparer<Exception>.Default.Equals(Error, other.Error);
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public IResult<TData> Bind(Func<IResult<TData>> function)
+    /// <summary>
+    /// Chains the current <see cref="Result{TData}" /> with another operation,
+    /// invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">The function to invoke if the current <see cref="Result{TData}" /> is successful.</param>
+    /// <returns>
+    /// The <see cref="Result{TData}" /> of the function if the current <see cref="Result{TData}" /> is successful,
+    /// otherwise the current <see cref="Result{TData}" />.
+    /// </returns>    [Pure]
+    public Result<TData> Bind(Func<Result<TData>> function)
     {
         return IsSuccess ? function() : this;
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public IResult<TData> BindWithData(Func<TData, IResult<TData>> function)
+    /// <summary>
+    /// Chains the current <see cref="Result{TData}" /> with another operation, passing through the <see cref="Data" />,
+    /// invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">
+    /// The function to invoke, passing through the <see cref="Data" />, if the current <see cref="Result{TData}" /> is
+    /// successful.
+    /// </param>
+    /// <returns>
+    /// The <see cref="Result{TData}" /> of the function if the current <see cref="Result{TData}" /> is successful,
+    /// otherwise the current <see cref="Result{TData}" />.
+    /// </returns>    [Pure]
+    public Result<TData> BindWithData(Func<TData, Result<TData>> function)
     {
         return IsSuccess ? function(Data) : this;
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public IResult<TNewData> BindAndTransform<TNewData>(Func<TData, IResult<TNewData>> function)
+    /// <summary>
+    /// Chains and transforms the current <see cref="Result{TData}" /> with another operation, passing through the
+    /// <see cref="Data" />,
+    /// invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <typeparam name="TNewData">The type of the new data to transform to.</typeparam>
+    /// <param name="function">
+    /// The function to invoke, which receives the current data and produces a new <see cref="Result{TNewData}" />.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="Result{TNewData}" /> containing transformed data if the current <see cref="Result{TData}" /> is
+    /// successful, or a failure <see cref="Result{TNewData}" /> if the current operation was unsuccessful.
+    /// </returns>    [Pure]
+    public Result<TNewData> BindAndTransform<TNewData>(Func<TData, Result<TNewData>> function)
         where TNewData : notnull
     {
         return IsSuccess ? function(Data) : Result<TNewData>.Failure(Error);
     }
 
-    /// <inheritdoc />
-    public async Task<IResult<TNewData>> BindAndTransformAsync<TNewData>(Func<TData, Task<IResult<TNewData>>> function)
+    /// <summary>
+    /// Chains and transforms the current <see cref="Result{TData}" /> with an asynchronous operation, passing through the
+    /// <see cref="Data" />, invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">
+    /// The asynchronous function to invoke, passing through the <see cref="Data" />, if the current
+    /// <see cref="Result{TData}" /> is successful.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
+    /// <see cref="Result{TData}" /> of the provided function
+    /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
+    /// </returns>
+    public async Task<Result<TNewData>> BindAndTransformAsync<TNewData>(Func<TData, Task<Result<TNewData>>> function)
         where TNewData : notnull
     {
         return IsSuccess ? await function(Data) : Result<TNewData>.Failure(Error);
     }
 
-    /// <inheritdoc />
-    public async Task<IResult<TNewData>> BindAndTransformAsync<TNewData>(
-        Func<TData, CancellationToken, Task<IResult<TNewData>>> function, CancellationToken cancellationToken)
+    /// <summary>
+    /// Chains and transforms the current <see cref="Result{TData}" /> with an asynchronous operation, passing through the
+    /// <see cref="Data" />, invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">
+    /// The asynchronous function to invoke, passing through the <see cref="Data" />, if the current
+    /// <see cref="Result{TData}" /> is successful, accepting a <see cref="CancellationToken" />.
+    /// </param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
+    /// <see cref="Result{TData}" /> of the provided function
+    /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
+    /// </returns>
+    public async Task<Result<TNewData>> BindAndTransformAsync<TNewData>(
+        Func<TData, CancellationToken, Task<Result<TNewData>>> function, CancellationToken cancellationToken)
         where TNewData : notnull
     {
         return IsSuccess
@@ -120,18 +177,37 @@ public class Result<TData> : IResult<TData> where TData : notnull
             : Result<TNewData>.Failure(Error);
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public IResult<TNewData> Map<TNewData>(Func<TData, TNewData> transform) where TNewData : notnull
+    /// <summary>
+    /// Transforms the data of the current <see cref="Result{TData}" /> if the operation was successful.
+    /// If the operation failed, the same failure <see cref="Result{TData}" /> is returned.
+    /// </summary>
+    /// <typeparam name="TNewData">The type of the new data to transform to.</typeparam>
+    /// <param name="transform">The function that transforms the current <see cref="Result{TData}" />'s data.</param>
+    /// <returns>
+    /// A new <see cref="Result{TNewData}" /> instance, either with transformed data if the current
+    /// <see cref="Result{TData}" /> is successful,
+    /// or the same failure <see cref="Result{TData}" /> if the current <see cref="Result{TData}" /> is unsuccessful.
+    /// </returns>    [Pure]
+    public Result<TNewData> Map<TNewData>(Func<TData, TNewData> transform) where TNewData : notnull
     {
         if (IsFailure) return Result<TNewData>.Failure(Error);
         var newData = transform(Data);
         return Result<TNewData>.Success(newData);
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public async Task<IResult<TNewData>> MapAsync<TNewData>(Func<TData, Task<TNewData>> transform)
+    /// <summary>
+    /// Transforms the data of the current <see cref="Result{TData}" /> asynchronously if the operation was successful.
+    /// If the operation failed, the same failure <see cref="Result{TData}" /> is returned.
+    /// </summary>
+    /// <typeparam name="TNewData">The type of the new data to transform to.</typeparam>
+    /// <param name="transform">The asynchronous function that transforms the current <see cref="Result{TData}" />'s data.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is a new
+    /// <see cref="Result{TNewData}" /> instance,
+    /// either with transformed data if the current <see cref="Result{TData}" /> is successful, or the same failure
+    /// <see cref="Result{TData}" /> if the current <see cref="Result{TData}" /> is unsuccessful.
+    /// </returns>    [Pure]
+    public async Task<Result<TNewData>> MapAsync<TNewData>(Func<TData, Task<TNewData>> transform)
         where TNewData : notnull
     {
         if (IsFailure) return Result<TNewData>.Failure(Error);
@@ -139,9 +215,23 @@ public class Result<TData> : IResult<TData> where TData : notnull
         return Result<TNewData>.Success(newData);
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public async Task<IResult<TNewData>> MapAsync<TNewData>(
+    /// <summary>
+    /// Transforms the data of the current <see cref="Result{TData}" /> asynchronously if the operation was successful.
+    /// If the operation failed, the same failure <see cref="Result{TData}" /> is returned.
+    /// </summary>
+    /// <typeparam name="TNewData">The type of the new data to transform to.</typeparam>
+    /// <param name="transform">
+    /// The asynchronous function that transforms the current <see cref="Result{TData}" />'s data,
+    /// accepting a <see cref="CancellationToken" />.
+    /// </param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is a new
+    /// <see cref="Result{TNewData}" /> instance,
+    /// either with transformed data if the current <see cref="Result{TData}" /> is successful, or the same failure
+    /// <see cref="Result{TData}" /> if the current <see cref="Result{TData}" /> is unsuccessful.
+    /// </returns>    [Pure]
+    public async Task<Result<TNewData>> MapAsync<TNewData>(
         Func<TData, CancellationToken, Task<TNewData>> transform, CancellationToken cancellationToken)
         where TNewData : notnull
     {
@@ -150,8 +240,12 @@ public class Result<TData> : IResult<TData> where TData : notnull
         return Result<TNewData>.Success(newData);
     }
 
-    /// <inheritdoc />
-    public IResult<TData> OnSuccess(Action<TData> action)
+    /// <summary>
+    /// Executes an action only if the <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="action">The action to execute.</param>
+    /// <returns>This result.</returns>
+    public Result<TData> OnSuccess(Action<TData> action)
     {
         if (IsSuccess)
             action(Data);
@@ -159,8 +253,12 @@ public class Result<TData> : IResult<TData> where TData : notnull
         return this;
     }
 
-    /// <inheritdoc />
-    public IResult<TData> OnFailure(Action<Exception> action)
+    /// <summary>
+    /// Executes an action only if the <see cref="Result{TData}" /> has failed.
+    /// </summary>
+    /// <param name="action">The action to execute.</param>
+    /// <returns>This result.</returns>
+    public Result<TData> OnFailure(Action<Exception> action)
     {
         if (IsFailure)
             action(Error);
@@ -168,7 +266,13 @@ public class Result<TData> : IResult<TData> where TData : notnull
         return this;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Deconstructs the current <see cref="Result{TData}" /> instance into its individual components:
+    /// success status, associated data, and any error that occurred.
+    /// </summary>
+    /// <param name="isSuccess">A boolean indicating whether the operation was successful.</param>
+    /// <param name="data">The data associated with the <see cref="Result{TData}" />.</param>
+    /// <param name="error">The exception associated with the failure.</param>
     [Pure]
     public void Deconstruct(out bool isSuccess, out TData? data, out Exception? error)
     {
@@ -177,32 +281,79 @@ public class Result<TData> : IResult<TData> where TData : notnull
         error = Error;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Chains the current <see cref="Result{TData}" /> with an asynchronous operation, passing through the
+    /// <see cref="Data" />, invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">
+    /// The asynchronous function to invoke, passing through the <see cref="Data" />, if the current
+    /// <see cref="Result{TData}" /> is successful.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
+    /// <see cref="Result{TData}" /> of the provided function
+    /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
+    /// </returns>
     [Pure]
-    public async Task<IResult<TData>> BindWithDataAsync(Func<TData, Task<IResult<TData>>> function)
+    public async Task<Result<TData>> BindWithDataAsync(Func<TData, Task<Result<TData>>> function)
     {
         return IsSuccess ? await function(Data) : this;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Chains the current <see cref="Result{TData}" /> with an asynchronous operation, passing through the
+    /// <see cref="Data" />, invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">
+    /// The asynchronous function to invoke, passing through the <see cref="Data" />, if the current
+    /// <see cref="Result{TData}" /> is successful, accepting a <see cref="CancellationToken" />.
+    /// </param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
+    /// <see cref="Result{TData}" /> of the provided function
+    /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
+    /// </returns>
     [Pure]
-    public async Task<IResult<TData>> BindWithDataAsync(
-        Func<TData, CancellationToken, Task<IResult<TData>>> function, CancellationToken cancellationToken)
+    public async Task<Result<TData>> BindWithDataAsync(
+        Func<TData, CancellationToken, Task<Result<TData>>> function, CancellationToken cancellationToken)
     {
         return IsSuccess ? await function(Data, cancellationToken) : this;
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public async Task<IResult<TData>> BindAsync(Func<Task<IResult<TData>>> function)
+    /// <summary>
+    /// Chains the current <see cref="Result{TData}" /> with an asynchronous operation,
+    /// invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">
+    /// The asynchronous function to invoke if the current <see cref="Result{TData}" /> is successful.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
+    /// <see cref="Result{TData}" /> of the provided function
+    /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
+    /// </returns>    [Pure]
+    public async Task<Result<TData>> BindAsync(Func<Task<Result<TData>>> function)
     {
         return IsSuccess ? await function() : this;
     }
 
-    /// <inheritdoc />
-    [Pure]
-    public async Task<IResult<TData>> BindAsync(
-        Func<CancellationToken, Task<IResult<TData>>> function, CancellationToken cancellationToken)
+    /// <summary>
+    /// Chains the current <see cref="Result{TData}" /> with an asynchronous operation,
+    /// invoking the provided function if the current <see cref="Result{TData}" /> is successful.
+    /// </summary>
+    /// <param name="function">
+    /// The asynchronous function to invoke if the current <see cref="Result{TData}" /> is successful, accepting a
+    /// <see cref="CancellationToken" />.
+    /// </param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
+    /// <see cref="Result{TData}" /> of the provided function
+    /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
+    /// </returns>    [Pure]
+    public async Task<Result<TData>> BindAsync(
+        Func<CancellationToken, Task<Result<TData>>> function, CancellationToken cancellationToken)
     {
         return IsSuccess ? await function(cancellationToken) : this;
     }
@@ -211,7 +362,7 @@ public class Result<TData> : IResult<TData> where TData : notnull
     [Pure]
     public override bool Equals(object? obj)
     {
-        if (obj is IResult<TData> other)
+        if (obj is Result<TData> other)
             return Equals(other);
         return false;
     }

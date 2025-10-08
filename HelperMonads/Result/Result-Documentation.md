@@ -6,7 +6,7 @@ This repository contains an implementation of the **Result** pattern in C#. The 
 
 ## Features
 
-The `Result<TData>` class and its associated `IResult<TData>` interface provide:
+The `Result<TData>` class provides:
 
 - **Success and Failure States**: Indicates if the operation was successful or failed.
 - **Data and Error Handling**: Optionally holds data on success or error information (exception) on failure.
@@ -20,9 +20,9 @@ The `Result<TData>` class and its associated `IResult<TData>` interface provide:
 - **Data Transformation**: Safely transform or map data if the operation is successful, or propagate the failure if it wasn't.
 - **Asynchronous Workflows**: The implementation supports async operations for handling I/O-bound or long-running tasks.
 
-## Interface: `IResult<TData>`
+## Class: `Result<TData>`
 
-The interface `IResult<TData>` defines the following methods and properties:
+The `Result<TData>` class supports the following:
 
 - `IsSuccess`: Returns `true` if the operation was successful.
 - `IsFailure`: Returns `true` if the operation failed.
@@ -37,11 +37,6 @@ The interface `IResult<TData>` defines the following methods and properties:
 - `OnSuccess`: Executes an action if the operation was successful.
 - `OnFailure`: Executes an action if the operation was a failure.
 - `Deconstruct`: Deconstructs the result into its components (`IsSuccess`, `Data`, and `Error`).
-
-## Class: `Result<TData>`
-
-The `Result<TData>` class is the concrete implementation of the `IResult<TData>` interface. It supports the following:
-
 - **Success Creation**: Use `Result<TData>.Success(data)` to create a successful result.
 - **Failure Creation**: Use `Result<TData>.Failure(error)` to represent a failure with an exception.
 - **Chaining and Transformation**: Chain operations or transform data using methods like `Bind`, `Map`, etc.
@@ -79,7 +74,7 @@ public class Program
         }
     }
 
-    public static IResult<int> PerformOperation(bool isSuccess)
+    public static Result<int> PerformOperation(bool isSuccess)
     {
         if (isSuccess)
         {
@@ -119,7 +114,7 @@ public static async Task ExampleAsync()
     }
 }
 
-public static Task<IResult<int>> PerformOperationAsync(bool isSuccess)
+public static Task<Result<int>> PerformOperationAsync(bool isSuccess)
 {
     if (isSuccess)
     {
@@ -131,7 +126,7 @@ public static Task<IResult<int>> PerformOperationAsync(bool isSuccess)
     }
 }
 
-public static async Task<IResult<int>> AnotherAsyncOperation()
+public static async Task<Result<int>> AnotherAsyncOperation()
 {
     return await Task.FromResult(Result.Success(100));
 }
