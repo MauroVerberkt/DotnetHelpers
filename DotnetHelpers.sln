@@ -1,10 +1,16 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperMonads", "HelperMonads\HelperMonads.csproj", "{25C8842C-1CB9-FDDB-AF86-3E8C23BB97F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperMonadsTests", "HelperMonadsTests\HelperMonadsTests.csproj", "{CDA9C85F-A108-46F0-BD83-7223E1085ECE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRules", "BusinessRules\BusinessRules.csproj", "{B29FB987-9E2B-4EF6-B412-2D41BDE69B36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRulesAnalyzer", "BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj", "{AE29F4E8-7FE1-4641-BBBC-271E88C3DFE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBusinessRules", "TestBusinessRules\TestBusinessRules.csproj", "{795AC43A-5BBA-478A-94EE-9651A7AEACDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +26,18 @@ Global
 		{CDA9C85F-A108-46F0-BD83-7223E1085ECE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDA9C85F-A108-46F0-BD83-7223E1085ECE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDA9C85F-A108-46F0-BD83-7223E1085ECE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B29FB987-9E2B-4EF6-B412-2D41BDE69B36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B29FB987-9E2B-4EF6-B412-2D41BDE69B36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B29FB987-9E2B-4EF6-B412-2D41BDE69B36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B29FB987-9E2B-4EF6-B412-2D41BDE69B36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE29F4E8-7FE1-4641-BBBC-271E88C3DFE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE29F4E8-7FE1-4641-BBBC-271E88C3DFE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE29F4E8-7FE1-4641-BBBC-271E88C3DFE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE29F4E8-7FE1-4641-BBBC-271E88C3DFE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{795AC43A-5BBA-478A-94EE-9651A7AEACDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{795AC43A-5BBA-478A-94EE-9651A7AEACDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{795AC43A-5BBA-478A-94EE-9651A7AEACDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{795AC43A-5BBA-478A-94EE-9651A7AEACDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
