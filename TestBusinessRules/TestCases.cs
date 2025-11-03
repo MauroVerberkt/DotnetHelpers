@@ -1,3 +1,4 @@
+using BusinessRules;
 using BusinessRules.Attributes;
 using BusinessRules.Rules.Authentication;
 using BusinessRules.Rules.Authorization;
@@ -155,5 +156,37 @@ public class WarningClassNoValidator
     public void SomeMethod()
     {
         Console.WriteLine("WARNING: No ValidatesBusinessRule for SESSION_ACTIVE exists");
+    }
+}
+
+// ============================================
+// BR004 TEST CASES - Throw without ValidatesBusinessRule
+// ============================================
+
+public class ThrowWithoutValidationTests
+{
+    // VALID: Has [ValidatesBusinessRule] attribute
+    [ValidatesBusinessRule(UserMustBeAuthenticated.Key)]
+    public void ValidCase_ThrowsWithAttribute_SOAP()
+    {
+        throw BusinessRule.ToFaultException(new UserMustBeAuthenticated());
+    }
+
+    [ValidatesBusinessRule(UserMustBeAdmin.Key)]
+    public void ValidCase_ThrowsWithAttribute_REST()
+    {
+        throw BusinessRule.ToException(new UserMustBeAdmin());
+    }
+
+    // ⚠️ BR004 WARNING - Missing [ValidatesBusinessRule] attribute
+    public void InvalidCase_ThrowsWithoutAttribute_SOAP()
+    {
+        throw BusinessRule.ToFaultException(new UserMustBeAuthenticated());
+    }
+
+    // ⚠️ BR004 WARNING - Missing [ValidatesBusinessRule] attribute
+    public void InvalidCase_ThrowsWithoutAttribute_REST()
+    {
+        throw BusinessRule.ToException(new UserMustBeAdmin());
     }
 }
