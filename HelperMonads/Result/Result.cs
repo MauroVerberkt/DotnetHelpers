@@ -15,26 +15,30 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
 {
     /// <summary>
     /// Indicates whether the operation was successful.
-    /// </summary>    [Pure]
+    /// </summary>
+    [Pure]
     [MemberNotNullWhen(true, nameof(Data))]
     [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; }
 
     /// <summary>
     /// Indicates whether the operation failed.
-    /// </summary>    [Pure]
+    /// </summary>
+    [Pure]
     [MemberNotNullWhen(true, nameof(Error))]
     [MemberNotNullWhen(false, nameof(Data))]
     public bool IsFailure => !IsSuccess;
 
     /// <summary>
     /// Data associated with the <see cref="Result{TData}" />.
-    /// </summary>    [Pure]
+    /// </summary>
+    [Pure]
     public TData? Data { get; }
 
     /// <summary>
     /// The exception associated with a failed operation.
-    /// </summary>    [Pure]
+    /// </summary>
+    [Pure]
     public Exception? Error { get; }
 
     /// <summary>
@@ -93,7 +97,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// <returns>
     /// The <see cref="Result{TData}" /> of the function if the current <see cref="Result{TData}" /> is successful,
     /// otherwise the current <see cref="Result{TData}" />.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public Result<TData> Bind(Func<Result<TData>> function)
     {
         return IsSuccess ? function() : this;
@@ -110,7 +115,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// <returns>
     /// The <see cref="Result{TData}" /> of the function if the current <see cref="Result{TData}" /> is successful,
     /// otherwise the current <see cref="Result{TData}" />.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public Result<TData> BindWithData(Func<TData, Result<TData>> function)
     {
         return IsSuccess ? function(Data) : this;
@@ -128,7 +134,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// <returns>
     /// A new <see cref="Result{TNewData}" /> containing transformed data if the current <see cref="Result{TData}" /> is
     /// successful, or a failure <see cref="Result{TNewData}" /> if the current operation was unsuccessful.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public Result<TNewData> BindAndTransform<TNewData>(Func<TData, Result<TNewData>> function)
         where TNewData : notnull
     {
@@ -187,7 +194,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// A new <see cref="Result{TNewData}" /> instance, either with transformed data if the current
     /// <see cref="Result{TData}" /> is successful,
     /// or the same failure <see cref="Result{TData}" /> if the current <see cref="Result{TData}" /> is unsuccessful.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public Result<TNewData> Map<TNewData>(Func<TData, TNewData> transform) where TNewData : notnull
     {
         if (IsFailure) return Result<TNewData>.Failure(Error);
@@ -206,7 +214,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// <see cref="Result{TNewData}" /> instance,
     /// either with transformed data if the current <see cref="Result{TData}" /> is successful, or the same failure
     /// <see cref="Result{TData}" /> if the current <see cref="Result{TData}" /> is unsuccessful.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public async Task<Result<TNewData>> MapAsync<TNewData>(Func<TData, Task<TNewData>> transform)
         where TNewData : notnull
     {
@@ -230,7 +239,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// <see cref="Result{TNewData}" /> instance,
     /// either with transformed data if the current <see cref="Result{TData}" /> is successful, or the same failure
     /// <see cref="Result{TData}" /> if the current <see cref="Result{TData}" /> is unsuccessful.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public async Task<Result<TNewData>> MapAsync<TNewData>(
         Func<TData, CancellationToken, Task<TNewData>> transform, CancellationToken cancellationToken)
         where TNewData : notnull
@@ -332,7 +342,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
     /// <see cref="Result{TData}" /> of the provided function
     /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public async Task<Result<TData>> BindAsync(Func<Task<Result<TData>>> function)
     {
         return IsSuccess ? await function() : this;
@@ -351,7 +362,8 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// A task representing the asynchronous operation. The task <see cref="Result{TData}" /> is the
     /// <see cref="Result{TData}" /> of the provided function
     /// if the current <see cref="Result{TData}" /> is successful, otherwise the current <see cref="Result{TData}" />.
-    /// </returns>    [Pure]
+    /// </returns>
+    [Pure]
     public async Task<Result<TData>> BindAsync(
         Func<CancellationToken, Task<Result<TData>>> function, CancellationToken cancellationToken)
     {

@@ -20,7 +20,8 @@ public abstract class Option<TValue>
 
     /// <summary>
     /// Gets a value indicating whether the option contains a value.
-    /// </summary>    [Pure]
+    /// </summary>
+    [Pure]
     public abstract bool HasValue { get; }
 
     /// <summary>
