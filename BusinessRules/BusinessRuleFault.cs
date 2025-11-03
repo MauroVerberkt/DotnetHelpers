@@ -5,4 +5,6 @@ namespace BusinessRules;
 
 [DataContract]
 public record BusinessRuleFault(
-    [property: DataMember, Required] BusinessRule BusinessRule);
+    [property: DataMember]
+    [property: Required]
+    BusinessRule BusinessRule);

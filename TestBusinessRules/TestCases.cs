@@ -1,4 +1,8 @@
 using BusinessRules.Attributes;
+using BusinessRules.Rules.Authentication;
+using BusinessRules.Rules.Authorization;
+using BusinessRules.Rules.Validation;
+using BusinessRules.Rules.General;
 
 namespace TestBusinessRules;
 
@@ -8,19 +12,19 @@ namespace TestBusinessRules;
 
 public class GlobalValidators
 {
-    [ValidatesBusinessRule("USER_AUTH")]
+    [ValidatesBusinessRule(UserMustBeAuthenticated.Key)]
     public void ValidateUserAuth()
     {
         Console.WriteLine("✓ Validates USER_AUTH");
     }
 
-    [ValidatesBusinessRule("USER_ADMIN")]
+    [ValidatesBusinessRule(UserMustBeAdmin.Key)]
     public void ValidateUserAdmin()
     {
         Console.WriteLine("✓ Validates USER_ADMIN");
     }
 
-    [ValidatesBusinessRule("AGE_MIN")]
+    [ValidatesBusinessRule(AgeMinimum.Key)]
     public void ValidateAgeMinimum()
     {
         Console.WriteLine("✓ Validates AGE_MIN");
@@ -33,20 +37,20 @@ public class GlobalValidators
 
 public class ValidCases
 {
-    [RequiresBusinessRule("USER_AUTH")]
+    [RequiresBusinessRule(UserMustBeAuthenticated.Key)]
     public void ValidMethod_HasMatchingValidator()
     {
         Console.WriteLine("Valid: USER_AUTH validator exists in GlobalValidators");
     }
 
-    [RequiresBusinessRule("USER_ADMIN")]
+    [RequiresBusinessRule(UserMustBeAdmin.Key)]
     public void AnotherValidMethod()
     {
         Console.WriteLine("Valid: USER_ADMIN validator exists in GlobalValidators");
     }
 }
 
-[RequiresBusinessRule("AGE_MIN")]
+[RequiresBusinessRule(AgeMinimum.Key)]
 public class ValidClassHasMatchingValidator
 {
     public void SomeMethod()
@@ -54,8 +58,6 @@ public class ValidClassHasMatchingValidator
         Console.WriteLine("Valid: AGE_MIN validator exists in GlobalValidators");
     }
 }
-
-
 
 // ============================================
 // INVALID CASES - ERROR (BR001)
@@ -65,7 +67,7 @@ public class ValidClassHasMatchingValidator
 
 public class Br001ErrorValidatorCases
 {
-    [ValidatesBusinessRule("USER_OWNER", ["ValidMethod_HasMatchingValidator"])]
+    [ValidatesBusinessRule("USER_OWNER")]
     public void ValidateUserAuth()
     {
         Console.WriteLine("✓ Validates USER_OWNER");
@@ -89,11 +91,6 @@ public class Br001ErrorClassHasMatchingValidator
         Console.WriteLine("Valid: USER_OWNER validator exists in GlobalValidators");
     }
 }
-
-
-
-
-
 
 // ============================================
 // INVALID CASES - ERROR (BR002)
@@ -137,14 +134,14 @@ public class Br002ErrorClassNoValidator
 public class WarningCases
 {
     // ⚠️ BR003 WARNING - No validator exists for "EMAIL_VERIFIED"
-    [RequiresBusinessRule("EMAIL_VERIFIED", enforceValidation: false)]
+    [RequiresBusinessRule(EmailVerified.Key, enforceValidation: false)]
     public void Warning_NoValidator_EnforceFalse()
     {
         Console.WriteLine("WARNING: No ValidatesBusinessRule for EMAIL_VERIFIED exists");
     }
 
     // ⚠️ BR003 WARNING - No validator exists for "TERMS_ACCEPTED"
-    [RequiresBusinessRule("TERMS_ACCEPTED", enforceValidation: false)]
+    [RequiresBusinessRule(TermsAccepted.Key, enforceValidation: false)]
     public void AnotherWarning()
     {
         Console.WriteLine("WARNING: No ValidatesBusinessRule for TERMS_ACCEPTED exists");
@@ -152,7 +149,7 @@ public class WarningCases
 }
 
 // ⚠️ BR003 WARNING - No validator exists for "SESSION_ACTIVE"
-[RequiresBusinessRule("SESSION_ACTIVE", enforceValidation: false)]
+[RequiresBusinessRule(SessionActive.Key, enforceValidation: false)]
 public class WarningClassNoValidator
 {
     public void SomeMethod()

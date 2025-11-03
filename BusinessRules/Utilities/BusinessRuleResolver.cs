@@ -10,26 +10,12 @@ public static class BusinessRuleResolver
     {
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-        foreach (var assembly in assemblies)
-        {
-            var types = assembly.GetTypes().Where(t => t.IsClass);
-
-            foreach (var type in types)
-            {
-                var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
-
-                foreach (var field in fields)
-                {
-                    if (field.FieldType != typeof(BusinessRule))
-                        continue;
-
-                    var br = (BusinessRule)field.GetValue(null)!;
-                    if (br.Key == key)
-                        return br;
-                }
-            }
-        }
-
-        return null;
+        return (assemblies
+            .SelectMany(assembly => assembly.GetTypes().Where(t => t.IsClass),
+                (assembly, type) => new { assembly, type })
+            .SelectMany(t1 => t1.type.GetFields(BindingFlags.Public | BindingFlags.Static),
+                (t1, field) => new { t1, field })
+            .Where(t1 => t1.field.FieldType == typeof(BusinessRule))
+            .Select(t1 => (BusinessRule)t1.field.GetValue(null)!)).FirstOrDefault(br => br.InternalKey == key);
     }
 }

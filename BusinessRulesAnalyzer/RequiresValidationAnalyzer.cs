@@ -73,9 +73,14 @@ public class RequiresValidationAnalyzer : DiagnosticAnalyzer
                     if (type == null || !SymbolEqualityComparer.Default.Equals(type, validatesAttrSymbol))
                         continue;
 
-                    if (attr.ArgumentList?.Arguments.FirstOrDefault()
-                            ?.Expression is LiteralExpressionSyntax literalExpr)
-                        validatedKeys.TryAdd(literalExpr.Token.ValueText, 0);
+                    var firstArg = attr.ArgumentList?.Arguments.FirstOrDefault();
+                    if (firstArg != null)
+                    {
+                        // Try to get the constant value (works for both literals and constants)
+                        var constantValue = model.GetConstantValue(firstArg.Expression);
+                        if (constantValue.HasValue && constantValue.Value is string ruleKey)
+                            validatedKeys.TryAdd(ruleKey, 0);
+                    }
                 }
             }
 

@@ -2,9 +2,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusinessRules\BusinessRules.csproj" />
+    <ProjectReference Include="..\BusinessRulesGenerator\BusinessRulesGenerator.csproj" 
+                      OutputItemType="Analyzer" 
+                      ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" 
                       OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\BusinessRules.json" />
   </ItemGroup>
 
   <PropertyGroup>

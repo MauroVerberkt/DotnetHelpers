@@ -9,4 +9,15 @@
     <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.2"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessRulesGenerator\BusinessRulesGenerator.csproj" 
+                      OutputItemType="Analyzer" 
+                      ReferenceOutputAssembly="false" 
+                      Pack="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\businessrules-schema.json" Pack="true" PackagePath="contentFiles\any\any" />
+  </ItemGroup>
+
 </Project>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,11 +19,11 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
         "Business rule key not found",
-        "Business rule with key '{0}' is not defined in any BusinessRule field",
+        "Business rule with key '{0}' is not defined in BusinessRules.json",
         Category,
         DiagnosticSeverity.Error,
         true,
-        "All business rule keys used in ValidatesBusinessRule or RequiresBusinessRule attributes must be defined as a BusinessRule field.",
+        "All business rule keys used in ValidatesBusinessRule or RequiresBusinessRule attributes must be defined in BusinessRules.json.",
         customTags: []
     );
 
@@ -49,38 +50,33 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
             var definedRuleKeys = new ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
             var reportedKeys = new ConcurrentDictionary<(FileLinePositionSpan, string), byte>();
 
-            // --- PRE-SCAN ALL BUSINESS RULE FIELDS ACROSS THE COMPILATION ---
-            foreach (var tree in compilationContext.Compilation.SyntaxTrees)
+            // --- READ BUSINESS RULES FROM JSON FILE ---
+            var jsonFile = compilationContext.Options.AdditionalFiles.FirstOrDefault(f => f.Path.EndsWith("BusinessRules.json"));
+            if (jsonFile != null)
             {
-                var model = compilationContext.Compilation.GetSemanticModel(tree);
-                var fieldDeclarations = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>();
-
-                foreach (var fieldDecl in fieldDeclarations)
-                foreach (var variable in fieldDecl.Declaration.Variables)
+                var jsonText = jsonFile.GetText(compilationContext.CancellationToken);
+                if (jsonText != null)
                 {
-                    var symbol = model.GetDeclaredSymbol(variable) as IFieldSymbol;
-                    if (symbol == null || !SymbolEqualityComparer.Default.Equals(symbol.Type, businessRuleSymbol))
-                        continue;
-
-                    // --- FIX: handle ObjectCreationExpressionSyntax and ImplicitObjectCreationExpressionSyntax separately ---
-                    BaseObjectCreationExpressionSyntax? creation = null;
-                    var value = variable.Initializer?.Value;
-
-                    creation = value switch
+                    try
                     {
-                        ObjectCreationExpressionSyntax o => o,
-                        ImplicitObjectCreationExpressionSyntax i => i,
-                        _ => creation
-                    };
-
-                    var firstArg = creation?.ArgumentList?.Arguments.FirstOrDefault();
-                    if (firstArg != null &&
-                        (firstArg.NameColon == null ||
-                         firstArg.NameColon.Name.Identifier.ValueText.Equals("key",
-                             StringComparison.OrdinalIgnoreCase)) &&
-                        firstArg.Expression is LiteralExpressionSyntax literal &&
-                        literal.IsKind(SyntaxKind.StringLiteralExpression))
-                        definedRuleKeys.TryAdd(literal.Token.ValueText, 0);
+                        var jsonDoc = JsonDocument.Parse(jsonText.ToString());
+                        if (jsonDoc.RootElement.TryGetProperty("businessRules", out var rulesArray) &&
+                            rulesArray.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var rule in rulesArray.EnumerateArray())
+                            {
+                                if (rule.TryGetProperty("key", out var keyProp) &&
+                                    keyProp.ValueKind == JsonValueKind.String)
+                                {
+                                    definedRuleKeys.TryAdd(keyProp.GetString()!, 0);
+                                }
+                            }
+                        }
+                    }
+                    catch (JsonException)
+                    {
+                        // Invalid JSON - skip
+                    }
                 }
             }
 
@@ -97,15 +93,19 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
                     !SymbolEqualityComparer.Default.Equals(attrType, requiresAttrSymbol))
                     return;
 
-                if (attribute.ArgumentList?.Arguments.FirstOrDefault()?.Expression is not LiteralExpressionSyntax literalExpr)
+                var firstArg = attribute.ArgumentList?.Arguments.FirstOrDefault();
+                if (firstArg == null)
                     return;
 
-                var ruleKey = literalExpr.Token.ValueText;
+                // Try to get the constant value (works for both literals and constants like UserMustBeAuthenticated.Key)
+                var constantValue = nodeContext.SemanticModel.GetConstantValue(firstArg.Expression);
+                if (!constantValue.HasValue || constantValue.Value is not string ruleKey)
+                    return;
 
-                var locationSpan = literalExpr.GetLocation().GetLineSpan();
+                var locationSpan = firstArg.Expression.GetLocation().GetLineSpan();
                 if (!definedRuleKeys.ContainsKey(ruleKey) &&
                     reportedKeys.TryAdd((locationSpan, ruleKey), 0))
-                    nodeContext.ReportDiagnostic(Diagnostic.Create(Rule, literalExpr.GetLocation(), ruleKey));
+                    nodeContext.ReportDiagnostic(Diagnostic.Create(Rule, firstArg.Expression.GetLocation(), ruleKey));
             }, SyntaxKind.Attribute);
         });
     }

@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRulesAnalyzer", "Bu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBusinessRules", "TestBusinessRules\TestBusinessRules.csproj", "{795AC43A-5BBA-478A-94EE-9651A7AEACDF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRulesGenerator", "BusinessRulesGenerator\BusinessRulesGenerator.csproj", "{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{795AC43A-5BBA-478A-94EE-9651A7AEACDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{795AC43A-5BBA-478A-94EE-9651A7AEACDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{795AC43A-5BBA-478A-94EE-9651A7AEACDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

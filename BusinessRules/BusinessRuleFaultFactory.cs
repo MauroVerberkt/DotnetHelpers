@@ -8,8 +8,8 @@ public static class BusinessRuleFaultFactory
     {
         FaultException<BusinessRuleFault> exception = new(
             new BusinessRuleFault(businessRule), 
-            new FaultReason(businessRule.Rule),
-            new FaultCode(businessRule.Key));
+            new FaultReason(businessRule.InternalRule),
+            new FaultCode(businessRule.InternalKey));
         return exception;
     }
 }
