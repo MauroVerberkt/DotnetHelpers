@@ -3,7 +3,6 @@ using BusinessRules.Attributes;
 using BusinessRules.UnitTests.TestHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
@@ -86,18 +85,6 @@ public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
     public static DiagnosticResult Diagnostic(string diagnosticId)
     {
         return CSharpCodeFixVerifier<TAnalyzer, TCodeFix, LineEndingNormalizingVerifier>.Diagnostic(diagnosticId);
-    }
-
-    public static async Task VerifyCodeFixAsync(string source, string fixedSource, params DiagnosticResult[] expected)
-    {
-        var test = new Test
-        {
-            TestCode = (await CSharpSyntaxTree.ParseText(source).GetRootAsync()).NormalizeWhitespace().ToFullString(),
-            FixedCode = (await CSharpSyntaxTree.ParseText(fixedSource).GetRootAsync()).NormalizeWhitespace()
-                .ToFullString()
-        };
-        test.ExpectedDiagnostics.AddRange(expected);
-        await test.RunAsync();
     }
 
     public static async Task VerifyCodeFixWithGeneratedCodeAsync(string source, string fixedSource,
