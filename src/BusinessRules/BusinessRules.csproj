@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.2"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="businessrules-schema.json" Pack="true" PackagePath="contentFiles\any\any" />
+  </ItemGroup>
+
+</Project>

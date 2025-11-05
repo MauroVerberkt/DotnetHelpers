@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\HelperMonads\HelperMonads.csproj" />
+      <ProjectReference Include="..\..\src\HelperMonads\HelperMonads.csproj" />
     </ItemGroup>
 
 </Project>

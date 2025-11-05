@@ -1,5 +1,5 @@
 {
-  "$schema": "./businessrules-schema.json",
+  "$schema": "../../src/BusinessRules/businessrules-schema.json",
   "businessRules": [
     {
       "className": "UserMustBeAuthenticated",

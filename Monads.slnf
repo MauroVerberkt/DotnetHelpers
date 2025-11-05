@@ -1,0 +1,9 @@
+{
+  "solution": {
+    "path": "DotnetHelpers.sln",
+    "projects": [
+      "src\\HelperMonads\\HelperMonads.csproj",
+      "tests\\HelperMonadsTests\\HelperMonadsTests.csproj"
+    ]
+  }
+}

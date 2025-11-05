@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\BusinessRules\BusinessRules.csproj" />
-    <ProjectReference Include="..\BusinessRulesGenerator\BusinessRulesGenerator.csproj" 
+    <ProjectReference Include="..\..\src\BusinessRules\BusinessRules.csproj" />
+    <ProjectReference Include="..\..\src\BusinessRulesGenerator\BusinessRulesGenerator.csproj" 
                       OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" 
+    <ProjectReference Include="..\..\src\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" 
                       OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" 
+    <ProjectReference Include="..\..\src\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" 
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\BusinessRules.json" />
+    <AdditionalFiles Include="Test.BusinessRules.json" />
   </ItemGroup>
 
   <PropertyGroup>
