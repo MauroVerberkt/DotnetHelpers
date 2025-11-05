@@ -6,6 +6,7 @@
       "src\\BusinessRulesAnalyzer\\BusinessRulesAnalyzer.csproj",
       "src\\BusinessRulesGenerator\\BusinessRulesGenerator.csproj",
       "src\\BusinessRulesFixProvider\\BusinessRulesFixProvider.csproj",
+      "tests\\BusinessRules.UnitTests\\BusinessRules.UnitTests.csproj",
       "tests\\TestBusinessRules\\TestBusinessRules.csproj",
       "tools\\BusinessRules.Analyzers.Package\\BusinessRules.Analyzers.Package.csproj"
     ]

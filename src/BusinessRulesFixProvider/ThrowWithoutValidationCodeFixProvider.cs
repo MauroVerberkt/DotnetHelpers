@@ -8,6 +8,9 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Formatting;
+using Microsoft.CodeAnalysis.Simplification;
 
 namespace BusinessRulesFixProvider;
 
@@ -105,7 +108,47 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root == null)
             return document;
+        
+        // Add using statement if not present
+        if (root is CompilationUnitSyntax compilationUnit)
+        {
+            var hasUsing = compilationUnit.Usings.Any(u => u.Name?.ToString() == "BusinessRules.Attributes");
+            if (!hasUsing)
+            {
+                var usingDirective = SyntaxFactory.UsingDirective(
+                    SyntaxFactory.QualifiedName(
+                        SyntaxFactory.IdentifierName("BusinessRules"),
+                        SyntaxFactory.IdentifierName("Attributes")));
+                root = compilationUnit.AddUsings(usingDirective);
+                // Re-find the method declaration in the new root
+                methodDeclaration = root.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                    .First(m => m.Identifier.Text == methodDeclaration.Identifier.Text);
+            }
+        }
 
+        // 1️⃣ Check if attribute already exists
+        var alreadyHasAttribute = methodDeclaration.AttributeLists
+            .SelectMany(a => a.Attributes)
+            .Any(a =>
+            {
+                var name = a.Name.ToString();
+                if (name != "ImplementsBusinessRule" && name != "ImplementsBusinessRuleAttribute")
+                    return false;
+
+                // Optional: Check for same argument
+                if (className != null)
+                    return a.ArgumentList?.Arguments.Any(arg => arg.ToString().Contains($"{className}.Key")) == true;
+
+                if (ruleKey != null)
+                    return a.ArgumentList?.Arguments.Any(arg => arg.ToString().Contains(ruleKey)) == true;
+
+                return true; // attribute without args already exists
+            });
+
+        if (alreadyHasAttribute)
+            return document;
+        
+        
         AttributeListSyntax attributeList;
         
         if (className != null)
@@ -148,8 +191,23 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
         }
 
         var leadingTrivia = methodDeclaration.GetLeadingTrivia();
-        var attributeWithTrivia = attributeList.WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
-        var newMethodDeclaration = methodDeclaration.WithLeadingTrivia(SyntaxFactory.TriviaList()).AddAttributeLists(attributeWithTrivia);
+        
+        // Copy the end-of-line trivia from the class declaration to match existing style
+        var classDecl = methodDeclaration.FirstAncestorOrSelf<ClassDeclarationSyntax>();
+        var eolTrivia = classDecl?.OpenBraceToken.TrailingTrivia.FirstOrDefault(t => t.IsKind(SyntaxKind.EndOfLineTrivia))
+            ?? SyntaxFactory.ElasticMarker;
+        
+        var attributeWithTrivia = attributeList
+            .WithLeadingTrivia(leadingTrivia)
+            .WithTrailingTrivia(eolTrivia);
+        
+        var existingAttributes = methodDeclaration.AttributeLists.ToList();
+        existingAttributes.Insert(0, attributeWithTrivia);
+        
+        var newMethodDeclaration = methodDeclaration
+            .WithLeadingTrivia(SyntaxFactory.TriviaList())
+            .WithAttributeLists(SyntaxFactory.List(existingAttributes));
+        
         var newRoot = root.ReplaceNode(methodDeclaration, newMethodDeclaration);
 
         return document.WithSyntaxRoot(newRoot);

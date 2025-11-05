@@ -1,0 +1,18 @@
+{
+  "businessRules": [
+    {
+      "className": "UserMustBeAuthenticated",
+      "key": "USER_AUTH",
+      "rule": "User must be authenticated",
+      "description": "Validates that the user is authenticated",
+      "category": "Authentication"
+    },
+    {
+      "className": "UserMustBeAdmin",
+      "key": "USER_ADMIN",
+      "rule": "User must have admin privileges",
+      "description": "Validates that the user has admin rights",
+      "category": "Authorization"
+    }
+  ]
+}

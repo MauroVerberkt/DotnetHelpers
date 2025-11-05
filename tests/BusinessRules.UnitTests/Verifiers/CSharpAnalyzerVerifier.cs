@@ -1,0 +1,66 @@
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Testing;
+using BusinessRules.UnitTests.TestHelpers;
+using BusinessRules.Attributes;
+
+namespace BusinessRules.UnitTests.Verifiers;
+
+public static class CSharpAnalyzerVerifier<TAnalyzer>
+    where TAnalyzer : DiagnosticAnalyzer, new()
+{
+    public class Test : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
+    {
+        public Test()
+        {
+            ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+            
+            var businessRulesRef = MetadataReference.CreateFromFile(typeof(BusinessRuleAttribute).Assembly.Location);
+            if (TestState.AdditionalReferences.All(r => r.Display != businessRulesRef.Display))
+            {
+                TestState.AdditionalReferences.Add(businessRulesRef);
+            }
+
+            // Add System.ServiceModel.Primitives for FaultException support
+            try
+            {
+                var serviceModelRef = MetadataReference.CreateFromFile(typeof(System.ServiceModel.FaultException<>).Assembly.Location);
+                if (TestState.AdditionalReferences.All(r => r.Display != serviceModelRef.Display))
+                {
+                    TestState.AdditionalReferences.Add(serviceModelRef);
+                }
+            }
+            catch
+            {
+                // System.ServiceModel not available - tests using it will fail
+            }
+        }
+
+        public void AddBusinessRulesJson(string jsonContent)
+        {
+            TestState.AnalyzerConfigFiles.Add(
+                ("/.globalconfig", "is_global = true"));
+            
+            TestState.AdditionalFiles.Add(("/Test.BusinessRules.json", jsonContent));
+        }
+    }
+
+    public static DiagnosticResult Diagnostic(string diagnosticId)
+        => CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>.Diagnostic(diagnosticId);
+
+    public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
+    {
+        var test = new Test { TestCode = source };
+        test.ExpectedDiagnostics.AddRange(expected);
+        await test.RunAsync();
+    }
+
+    public static async Task VerifyAnalyzerWithGeneratedCodeAsync(string source, params DiagnosticResult[] expected)
+    {
+        var test = new Test { TestCode = source };
+        test.TestState.Sources.Add(GeneratedBusinessRules.GetAllGeneratedSources());
+        test.ExpectedDiagnostics.AddRange(expected);
+        await test.RunAsync();
+    }
+}
