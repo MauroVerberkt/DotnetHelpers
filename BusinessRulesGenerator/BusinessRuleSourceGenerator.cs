@@ -33,7 +33,6 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
                 var rulesByCategory = businessRulesConfig.BusinessRules
                     .GroupBy(r => string.IsNullOrWhiteSpace(r.Category) ? "General" : r.Category);
 
-                var fileIndex = 0;
                 foreach (var categoryGroup in rulesByCategory)
                 {
                     var namespaceName = $"BusinessRules.Rules.{SanitizeNamespace(categoryGroup.Key)}";
@@ -47,7 +46,7 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
 
                     foreach (var rule in categoryGroup)
                     {
-                        sourceBuilder.AppendLine($"public class {rule.ClassName}() : BusinessRule(Key, Rule, Description, Category)");
+                        sourceBuilder.AppendLine($"public class {rule.ClassName}() : BusinessRule<{rule.ClassName}>(Key, Rule, Description, Category)");
                         sourceBuilder.AppendLine("{");
                         sourceBuilder.AppendLine($"    public const string Key = \"{EscapeString(rule.Key)}\";");
                         sourceBuilder.AppendLine();
@@ -65,7 +64,6 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
                     var hintName = $"{fileName}.{SanitizeNamespace(categoryGroup.Key)}.g.cs";
                     
                     spc.AddSource(hintName, SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
-                    fileIndex++;
                 }
             }
             catch (JsonException)

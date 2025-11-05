@@ -1,4 +1,3 @@
-using BusinessRules;
 using BusinessRules.Attributes;
 using BusinessRules.Rules.Authentication;
 using BusinessRules.Rules.Authorization;
@@ -169,24 +168,24 @@ public class ThrowWithoutValidationTests
     [ValidatesBusinessRule(UserMustBeAuthenticated.Key)]
     public void ValidCase_ThrowsWithAttribute_SOAP()
     {
-        throw BusinessRule.ToFaultException(new UserMustBeAuthenticated());
+        throw UserMustBeAuthenticated.ToFaultException();
     }
 
     [ValidatesBusinessRule(UserMustBeAdmin.Key)]
     public void ValidCase_ThrowsWithAttribute_REST()
     {
-        throw BusinessRule.ToException(new UserMustBeAdmin());
+        throw UserMustBeAdmin.ToException();
     }
 
     // ⚠️ BR004 WARNING - Missing [ValidatesBusinessRule] attribute
     public void InvalidCase_ThrowsWithoutAttribute_SOAP()
     {
-        throw BusinessRule.ToFaultException(new UserMustBeAuthenticated());
+        throw UserMustBeAuthenticated.ToFaultException();
     }
 
     // ⚠️ BR004 WARNING - Missing [ValidatesBusinessRule] attribute
     public void InvalidCase_ThrowsWithoutAttribute_REST()
     {
-        throw BusinessRule.ToException(new UserMustBeAdmin());
+        throw UserMustBeAdmin.ToException();
     }
 }

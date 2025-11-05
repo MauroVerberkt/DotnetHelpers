@@ -8,6 +8,9 @@
     <ProjectReference Include="..\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" 
                       OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" 
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

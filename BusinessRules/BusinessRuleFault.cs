@@ -7,4 +7,4 @@ namespace BusinessRules;
 public record BusinessRuleFault(
     [property: DataMember]
     [property: Required]
-    BusinessRule BusinessRule);
+    BusinessRuleBase BusinessRule);

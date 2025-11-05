@@ -7,7 +7,7 @@ namespace BusinessRules.Attributes;
 public class RequiresBusinessRuleAttribute(string ruleKey, bool enforceValidation = true) : Attribute
 {
     public string RuleKey { get; } = ruleKey;
-    public BusinessRule Rule { get; } = 
+    public BusinessRuleBase Rule { get; } = 
         BusinessRuleResolver.FindBusinessRuleByKey(ruleKey) 
         ?? throw new ArgumentException($"BusinessRule with key '{ruleKey}' not found in any [BusinessRuleGroup] class.");
 

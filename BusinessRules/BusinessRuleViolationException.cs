@@ -4,21 +4,21 @@ namespace BusinessRules;
 
 public class BusinessRuleViolationException : Exception
 {
-    public BusinessRule BusinessRule { get; }
+    public BusinessRuleBase BusinessRule { get; }
 
-    public BusinessRuleViolationException(BusinessRule businessRule)
+    public BusinessRuleViolationException(BusinessRuleBase businessRule)
         : base(businessRule.InternalRule)
     {
         BusinessRule = businessRule;
     }
 
-    public BusinessRuleViolationException(BusinessRule businessRule, string message)
+    public BusinessRuleViolationException(BusinessRuleBase businessRule, string message)
         : base(message)
     {
         BusinessRule = businessRule;
     }
 
-    public BusinessRuleViolationException(BusinessRule businessRule, string message, Exception innerException)
+    public BusinessRuleViolationException(BusinessRuleBase businessRule, string message, Exception innerException)
         : base(message, innerException)
     {
         BusinessRule = businessRule;

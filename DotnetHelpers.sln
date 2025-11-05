@@ -14,6 +14,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBusinessRules", "TestBu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRulesGenerator", "BusinessRulesGenerator\BusinessRulesGenerator.csproj", "{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRulesFixProvider", "BusinessRulesFixProvider\BusinessRulesFixProvider.csproj", "{8C185323-D681-4784-A2CB-D2B045FD0221}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRules.Analyzers.Package", "BusinessRules.Analyzers.Package\BusinessRules.Analyzers.Package.csproj", "{485B5C59-265D-4B2A-A7A7-95639FCB4544}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +48,14 @@ Global
 		{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB3C0E84-089D-4C57-B335-4FDDC45EABB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C185323-D681-4784-A2CB-D2B045FD0221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C185323-D681-4784-A2CB-D2B045FD0221}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C185323-D681-4784-A2CB-D2B045FD0221}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C185323-D681-4784-A2CB-D2B045FD0221}.Release|Any CPU.Build.0 = Release|Any CPU
+		{485B5C59-265D-4B2A-A7A7-95639FCB4544}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{485B5C59-265D-4B2A-A7A7-95639FCB4544}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{485B5C59-265D-4B2A-A7A7-95639FCB4544}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{485B5C59-265D-4B2A-A7A7-95639FCB4544}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

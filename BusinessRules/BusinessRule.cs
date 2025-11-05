@@ -5,37 +5,37 @@ using System.ServiceModel;
 namespace BusinessRules;
 
 [DataContract]
-public class BusinessRule(string key, string rule, string description = "", string category = "")
+public abstract class BusinessRule<T>(string key, string rule, string description = "", string category = "") : BusinessRuleBase
+    where T : BusinessRule<T>, new()
 {
-    [DataMember] 
-    [Required] 
-    internal string InternalKey { get; } = key;
+    [DataMember, Required]
+    internal override string InternalKey { get; } = key;
 
-    [DataMember] 
-    [Required] 
-    internal string InternalRule { get; } = rule;
-    
-    [DataMember] 
-    internal string InternalDescription { get; } = description;
-    
-    [DataMember]  
-    internal string InternalCategory { get; } = category;
+    [DataMember, Required]
+    internal override string InternalRule { get; } = rule;
 
-    public static FaultException<BusinessRuleFault> ToFaultException(BusinessRule businessRule)
+    [DataMember]
+    internal override string InternalDescription { get; } = description;
+
+    [DataMember]
+    internal override string InternalCategory { get; } = category;
+
+    public static FaultException<BusinessRuleFault> ToFaultException()
     {
+        var instance = new T();
         return new FaultException<BusinessRuleFault>(
-            new BusinessRuleFault(businessRule),
-            new FaultReason(businessRule.InternalRule),
-            new FaultCode(businessRule.InternalKey));
+            new BusinessRuleFault(instance),
+            new FaultReason(instance.InternalRule),
+            new FaultCode(instance.InternalKey));
     }
 
-    public static BusinessRuleViolationException ToException(BusinessRule businessRule)
+    public static BusinessRuleViolationException ToException()
     {
-        return new BusinessRuleViolationException(businessRule);
+        return new BusinessRuleViolationException(new T());
     }
 
-    public static BusinessRuleViolationException ToException(BusinessRule businessRule, string message)
+    public static BusinessRuleViolationException ToException(string message)
     {
-        return new BusinessRuleViolationException(businessRule, message);
+        return new BusinessRuleViolationException(new T(), message);
     }
 }
