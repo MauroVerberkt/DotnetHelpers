@@ -18,23 +18,23 @@ public class RequiresValidationAnalyzer : DiagnosticAnalyzer
 
     private static readonly DiagnosticDescriptor ErrorRule = new(
         DiagnosticIdError,
-        "Missing ValidatesBusinessRule attribute",
+        "Missing ImplementsBusinessRule attribute",
         "Business rule '{0}' is required but not validated anywhere in the compilation",
         Category,
         DiagnosticSeverity.Error,
         true,
-        "When RequiresBusinessRule has enforceValidation=true, a ValidatesBusinessRule with the same ruleKey must exist in the compilation.",
+        "When BusinessRule has enforceValidation=true, a ImplementsBusinessRule with the same ruleKey must exist in the compilation.",
         customTags: [WellKnownDiagnosticTags.CompilationEnd]
     );
 
     private static readonly DiagnosticDescriptor WarningRule = new(
         DiagnosticIdWarning,
-        "Missing ValidatesBusinessRule attribute",
+        "Missing ImplementsBusinessRule attribute",
         "Business rule '{0}' is required but not validated anywhere in the compilation",
         Category,
         DiagnosticSeverity.Warning,
         true,
-        "When RequiresBusinessRule has enforceValidation=false, a ValidatesBusinessRule with the same ruleKey should exist in the compilation.",
+        "When BusinessRule has enforceValidation=false, a ImplementsBusinessRule with the same ruleKey should exist in the compilation.",
         customTags: [WellKnownDiagnosticTags.CompilationEnd]
     );
 
@@ -49,10 +49,10 @@ public class RequiresValidationAnalyzer : DiagnosticAnalyzer
         {
             var requiresAttrSymbol =
                 compilationContext.Compilation.GetTypeByMetadataName(
-                    "BusinessRules.Attributes.RequiresBusinessRuleAttribute");
+                    "BusinessRules.Attributes.BusinessRuleAttribute");
             var validatesAttrSymbol =
                 compilationContext.Compilation.GetTypeByMetadataName(
-                    "BusinessRules.Attributes.ValidatesBusinessRuleAttribute");
+                    "BusinessRules.Attributes.ImplementsBusinessRuleAttribute");
 
             if (requiresAttrSymbol == null || validatesAttrSymbol == null)
                 return;
@@ -61,7 +61,7 @@ public class RequiresValidationAnalyzer : DiagnosticAnalyzer
             var requiredRules = new ConcurrentBag<(string RuleKey, bool EnforceValidation, Location Location)>();
             var reportedKeys = new ConcurrentDictionary<(FileLinePositionSpan, string), byte>();
 
-            // --- PRE-SCAN ALL VALIDATESBUSINESSRULE ATTRIBUTES ---
+            // --- PRE-SCAN ALL ImplementsBusinessRule ATTRIBUTES ---
             foreach (var tree in compilationContext.Compilation.SyntaxTrees)
             {
                 var model = compilationContext.Compilation.GetSemanticModel(tree);

@@ -4,7 +4,7 @@ using BusinessRules.Utilities;
 namespace BusinessRules.Attributes;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
-public class RequiresBusinessRuleAttribute(string ruleKey, bool enforceValidation = true) : Attribute
+public class BusinessRuleAttribute(string ruleKey, bool enforceValidation = true) : Attribute
 {
     public string RuleKey { get; } = ruleKey;
     public BusinessRuleBase Rule { get; } = 

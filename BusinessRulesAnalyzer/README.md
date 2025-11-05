@@ -5,10 +5,10 @@ A Roslyn analyzer that enforces business rule validation patterns in your C# cod
 ## Features
 
 ### BR001: Business Rule Key Validation
-Ensures that all business rule keys referenced in `RequiresBusinessRule` and `ValidatesBusinessRule` attributes actually exist in a `BusinessRule` field.
+Ensures that all business rule keys referenced in `BusinessRule` and `ImplementsBusinessRule` attributes actually exist in a `BusinessRule` field.
 
 ### BR002/BR003: Validation Coverage
-Ensures that every `RequiresBusinessRule` has a corresponding `ValidatesBusinessRule` with the same `ruleKey` **anywhere in the compilation**.
+Ensures that every `BusinessRule` has a corresponding `ImplementsBusinessRule` with the same `ruleKey` **anywhere in the compilation**.
 
 - **BR002** (Error): When `enforceValidation=true` (default)
 - **BR003** (Warning): When `enforceValidation=false`
@@ -17,8 +17,8 @@ Ensures that every `RequiresBusinessRule` has a corresponding `ValidatesBusiness
 
 The analyzer uses a **compilation-wide matching approach**:
 
-1. **Index Phase**: Scans all methods and classes in the compilation and builds an index of all `ruleKey` values found in `ValidatesBusinessRule` attributes
-2. **Validation Phase**: For each `RequiresBusinessRule`, checks if its `ruleKey` exists in the index
+1. **Index Phase**: Scans all methods and classes in the compilation and builds an index of all `ruleKey` values found in `ImplementsBusinessRule` attributes
+2. **Validation Phase**: For each `BusinessRule`, checks if its `ruleKey` exists in the index
 3. **Report Phase**: Reports diagnostics for any unvalidated requirements
 
 This means:
@@ -33,10 +33,10 @@ This means:
 ```csharp
 public class MyService
 {
-    [ValidatesBusinessRule("USER_AUTH")]
+    [ImplementsBusinessRule("USER_AUTH")]
     public void ValidateAuth() { }
     
-    [RequiresBusinessRule("USER_AUTH")]
+    [BusinessRule("USER_AUTH")]
     public void DoSomething() { }
 }
 ```
@@ -45,13 +45,13 @@ public class MyService
 ```csharp
 public class Validators
 {
-    [ValidatesBusinessRule("USER_AUTH")]
+    [ImplementsBusinessRule("USER_AUTH")]
     public void ValidateAuth() { }
 }
 
 public class MyService
 {
-    [RequiresBusinessRule("USER_AUTH")]  // ✅ Matches validator in Validators class
+    [BusinessRule("USER_AUTH")]  // ✅ Matches validator in Validators class
     public void DoSomething() { }
 }
 ```
@@ -60,7 +60,7 @@ public class MyService
 ```csharp
 public class MyService
 {
-    [RequiresBusinessRule("PAYMENT_VERIFIED")]  // ❌ BR002: No validator found
+    [BusinessRule("PAYMENT_VERIFIED")]  // ❌ BR002: No validator found
     public void ProcessPayment() { }
 }
 ```

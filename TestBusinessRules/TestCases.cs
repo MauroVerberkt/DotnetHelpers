@@ -12,19 +12,19 @@ namespace TestBusinessRules;
 
 public class GlobalValidators
 {
-    [ValidatesBusinessRule(UserMustBeAuthenticated.Key)]
+    [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
     public void ValidateUserAuth()
     {
         Console.WriteLine("✓ Validates USER_AUTH");
     }
 
-    [ValidatesBusinessRule(UserMustBeAdmin.Key)]
+    [ImplementsBusinessRule(UserMustBeAdmin.Key)]
     public void ValidateUserAdmin()
     {
         Console.WriteLine("✓ Validates USER_ADMIN");
     }
 
-    [ValidatesBusinessRule(AgeMinimum.Key)]
+    [ImplementsBusinessRule(AgeMinimum.Key)]
     public void ValidateAgeMinimum()
     {
         Console.WriteLine("✓ Validates AGE_MIN");
@@ -37,20 +37,20 @@ public class GlobalValidators
 
 public class ValidCases
 {
-    [RequiresBusinessRule(UserMustBeAuthenticated.Key)]
+    [BusinessRule(UserMustBeAuthenticated.Key)]
     public void ValidMethod_HasMatchingValidator()
     {
         Console.WriteLine("Valid: USER_AUTH validator exists in GlobalValidators");
     }
 
-    [RequiresBusinessRule(UserMustBeAdmin.Key)]
+    [BusinessRule(UserMustBeAdmin.Key)]
     public void AnotherValidMethod()
     {
         Console.WriteLine("Valid: USER_ADMIN validator exists in GlobalValidators");
     }
 }
 
-[RequiresBusinessRule(AgeMinimum.Key)]
+[BusinessRule(AgeMinimum.Key)]
 public class ValidClassHasMatchingValidator
 {
     public void SomeMethod()
@@ -67,7 +67,7 @@ public class ValidClassHasMatchingValidator
 
 public class Br001ErrorValidatorCases
 {
-    [ValidatesBusinessRule("USER_OWNER")]
+    [ImplementsBusinessRule("USER_OWNER")]
     public void ValidateUserAuth()
     {
         Console.WriteLine("✓ Validates USER_OWNER");
@@ -76,14 +76,14 @@ public class Br001ErrorValidatorCases
 
 public class Br001ErrorCases
 {
-    [RequiresBusinessRule("USER_OWNER")]
+    [BusinessRule("USER_OWNER")]
     public void ValidMethod_HasMatchingValidator()
     {
         Console.WriteLine("Valid: USER_OWNER validator exists in GlobalValidators");
     }
 }
 
-[RequiresBusinessRule("USER_OWNER")]
+[BusinessRule("USER_OWNER")]
 public class Br001ErrorClassHasMatchingValidator
 {
     public void SomeMethod()
@@ -101,27 +101,27 @@ public class Br001ErrorClassHasMatchingValidator
 public class Br002ErrorCases
 {
     // ❌ BR002 ERROR - No validator exists for "PAYMENT_VERIFIED"
-    [RequiresBusinessRule("PAYMENT_VERIFIED")]
+    [BusinessRule("PAYMENT_VERIFIED")]
     public void Error_NoValidator_DefaultEnforce()
     {
-        Console.WriteLine("ERROR: No ValidatesBusinessRule for PAYMENT_VERIFIED exists");
+        Console.WriteLine("ERROR: No ImplementsBusinessRule for PAYMENT_VERIFIED exists");
     }
 
     // ❌ BR002 ERROR - No validator exists for "DATA_ENCRYPTED"
-    [RequiresBusinessRule("DATA_ENCRYPTED", enforceValidation: true)]
+    [BusinessRule("DATA_ENCRYPTED", enforceValidation: true)]
     public void Error_NoValidator_ExplicitEnforce()
     {
-        Console.WriteLine("ERROR: No ValidatesBusinessRule for DATA_ENCRYPTED exists");
+        Console.WriteLine("ERROR: No ImplementsBusinessRule for DATA_ENCRYPTED exists");
     }
 }
 
 // ❌ BR002 ERROR - No validator exists for "INVENTORY_AVAILABLE"
-[RequiresBusinessRule("INVENTORY_AVAILABLE")]
+[BusinessRule("INVENTORY_AVAILABLE")]
 public class Br002ErrorClassNoValidator
 {
     public void SomeMethod()
     {
-        Console.WriteLine("ERROR: No ValidatesBusinessRule for INVENTORY_AVAILABLE exists");
+        Console.WriteLine("ERROR: No ImplementsBusinessRule for INVENTORY_AVAILABLE exists");
     }
 }
 
@@ -134,56 +134,56 @@ public class Br002ErrorClassNoValidator
 public class WarningCases
 {
     // ⚠️ BR003 WARNING - No validator exists for "EMAIL_VERIFIED"
-    [RequiresBusinessRule(EmailVerified.Key, enforceValidation: false)]
+    [BusinessRule(EmailVerified.Key, enforceValidation: false)]
     public void Warning_NoValidator_EnforceFalse()
     {
-        Console.WriteLine("WARNING: No ValidatesBusinessRule for EMAIL_VERIFIED exists");
+        Console.WriteLine("WARNING: No ImplementsBusinessRule for EMAIL_VERIFIED exists");
     }
 
     // ⚠️ BR003 WARNING - No validator exists for "TERMS_ACCEPTED"
-    [RequiresBusinessRule(TermsAccepted.Key, enforceValidation: false)]
+    [BusinessRule(TermsAccepted.Key, enforceValidation: false)]
     public void AnotherWarning()
     {
-        Console.WriteLine("WARNING: No ValidatesBusinessRule for TERMS_ACCEPTED exists");
+        Console.WriteLine("WARNING: No ImplementsBusinessRule for TERMS_ACCEPTED exists");
     }
 }
 
 // ⚠️ BR003 WARNING - No validator exists for "SESSION_ACTIVE"
-[RequiresBusinessRule(SessionActive.Key, enforceValidation: false)]
+[BusinessRule(SessionActive.Key, enforceValidation: false)]
 public class WarningClassNoValidator
 {
     public void SomeMethod()
     {
-        Console.WriteLine("WARNING: No ValidatesBusinessRule for SESSION_ACTIVE exists");
+        Console.WriteLine("WARNING: No ImplementsBusinessRule for SESSION_ACTIVE exists");
     }
 }
 
 // ============================================
-// BR004 TEST CASES - Throw without ValidatesBusinessRule
+// BR004 TEST CASES - Throw without ImplementsBusinessRule
 // ============================================
 
 public class ThrowWithoutValidationTests
 {
-    // VALID: Has [ValidatesBusinessRule] attribute
-    [ValidatesBusinessRule(UserMustBeAuthenticated.Key)]
+    // VALID: Has [ImplementsBusinessRule] attribute
+    [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
     public void ValidCase_ThrowsWithAttribute_SOAP()
     {
         throw UserMustBeAuthenticated.ToFaultException();
     }
 
-    [ValidatesBusinessRule(UserMustBeAdmin.Key)]
+    [ImplementsBusinessRule(UserMustBeAdmin.Key)]
     public void ValidCase_ThrowsWithAttribute_REST()
     {
         throw UserMustBeAdmin.ToException();
     }
 
-    // ⚠️ BR004 WARNING - Missing [ValidatesBusinessRule] attribute
+    // ⚠️ BR004 WARNING - Missing [ImplementsBusinessRule] attribute
     public void InvalidCase_ThrowsWithoutAttribute_SOAP()
     {
         throw UserMustBeAuthenticated.ToFaultException();
     }
 
-    // ⚠️ BR004 WARNING - Missing [ValidatesBusinessRule] attribute
+    // ⚠️ BR004 WARNING - Missing [ImplementsBusinessRule] attribute
     public void InvalidCase_ThrowsWithoutAttribute_REST()
     {
         throw UserMustBeAdmin.ToException();

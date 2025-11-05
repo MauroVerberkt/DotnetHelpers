@@ -17,11 +17,11 @@ public class ThrowWithoutValidationAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
         "Throwing BusinessRule without validation",
-        "Throwing a BusinessRule exception without [ValidatesBusinessRule] attribute on method '{0}'",
+        "Throwing a BusinessRule exception without [ImplementsBusinessRule] attribute on method '{0}'",
         Category,
         DiagnosticSeverity.Warning,
         true,
-        "Methods that throw BusinessRule exceptions should have the [ValidatesBusinessRule] attribute to document what rule is being validated."
+        "Methods that throw BusinessRule exceptions should have the [ImplementsBusinessRule] attribute to document what rule is being validated."
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
@@ -35,7 +35,7 @@ public class ThrowWithoutValidationAnalyzer : DiagnosticAnalyzer
         {
             var validatesAttrSymbol =
                 compilationContext.Compilation.GetTypeByMetadataName(
-                    "BusinessRules.Attributes.ValidatesBusinessRuleAttribute");
+                    "BusinessRules.Attributes.ImplementsBusinessRuleAttribute");
             var businessRuleFaultSymbol = 
                 compilationContext.Compilation.GetTypeByMetadataName("BusinessRules.BusinessRuleFault");
             var businessRuleViolationSymbol = 
@@ -96,7 +96,7 @@ public class ThrowWithoutValidationAnalyzer : DiagnosticAnalyzer
                 if (methodSymbol == null)
                     return;
 
-                // Check if method has ValidatesBusinessRule attribute
+                // Check if method has ImplementsBusinessRule attribute
                 var hasValidatesAttribute = methodSymbol.GetAttributes()
                     .Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, validatesAttrSymbol));
 

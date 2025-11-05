@@ -23,7 +23,7 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
         Category,
         DiagnosticSeverity.Error,
         true,
-        "All business rule keys used in ValidatesBusinessRule or RequiresBusinessRule attributes must be defined in BusinessRules.json.",
+        "All business rule keys used in ImplementsBusinessRule or BusinessRule attributes must be defined in BusinessRules.json.",
         customTags: []
     );
 
@@ -38,10 +38,10 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
         {
             var validatesAttrSymbol =
                 compilationContext.Compilation.GetTypeByMetadataName(
-                    "BusinessRules.Attributes.ValidatesBusinessRuleAttribute");
+                    "BusinessRules.Attributes.ImplementsBusinessRuleAttribute");
             var requiresAttrSymbol =
                 compilationContext.Compilation.GetTypeByMetadataName(
-                    "BusinessRules.Attributes.RequiresBusinessRuleAttribute");
+                    "BusinessRules.Attributes.BusinessRuleAttribute");
             var businessRuleSymbol = compilationContext.Compilation.GetTypeByMetadataName("BusinessRules.BusinessRule");
 
             if (validatesAttrSymbol == null || requiresAttrSymbol == null || businessRuleSymbol == null)

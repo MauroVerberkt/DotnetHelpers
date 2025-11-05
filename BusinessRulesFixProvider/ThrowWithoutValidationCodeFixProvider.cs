@@ -14,7 +14,7 @@ namespace BusinessRulesFixProvider;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ThrowWithoutValidationCodeFixProvider)), Shared]
 public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
 {
-    private const string Title = "Add [ValidatesBusinessRule] attribute";
+    private const string Title = "Add [ImplementsBusinessRule] attribute";
 
     public sealed override ImmutableArray<string> FixableDiagnosticIds => ["BR004"];
 
@@ -46,7 +46,7 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
 
         context.RegisterCodeFix(
             CodeAction.Create(
-                title: ruleKey != null ? $"Add [ValidatesBusinessRule(\"{ruleKey}\")]" : Title,
+                title: ruleKey != null ? $"Add [ImplementsBusinessRule(\"{ruleKey}\")]" : Title,
                 createChangedDocument: c => AddValidatesAttributeAsync(context.Document, methodDeclaration, ruleKey, c),
                 equivalenceKey: Title),
             diagnostic);
@@ -108,7 +108,7 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
             ? SyntaxFactory.AttributeList(
                 SyntaxFactory.SingletonSeparatedList(
                     SyntaxFactory.Attribute(
-                        SyntaxFactory.IdentifierName("ValidatesBusinessRule"),
+                        SyntaxFactory.IdentifierName("ImplementsBusinessRule"),
                         SyntaxFactory.AttributeArgumentList(
                             SyntaxFactory.SingletonSeparatedList(
                                 SyntaxFactory.AttributeArgument(
@@ -118,7 +118,7 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
             : SyntaxFactory.AttributeList(
                 SyntaxFactory.SingletonSeparatedList(
                     SyntaxFactory.Attribute(
-                        SyntaxFactory.IdentifierName("ValidatesBusinessRule"))));
+                        SyntaxFactory.IdentifierName("ImplementsBusinessRule"))));
 
         var leadingTrivia = methodDeclaration.GetLeadingTrivia();
         var attributeWithTrivia = attributeList.WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
