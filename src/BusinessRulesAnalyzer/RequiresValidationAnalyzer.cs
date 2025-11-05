@@ -62,6 +62,9 @@ public class RequiresValidationAnalyzer : DiagnosticAnalyzer
             var reportedKeys = new ConcurrentDictionary<(FileLinePositionSpan, string), byte>();
 
             // --- PRE-SCAN ALL ImplementsBusinessRule ATTRIBUTES ---
+            // Must scan synchronously before other actions to avoid race conditions.
+            // Suppressing RS1030: GetSemanticModel is intentional here for correct ordering.
+#pragma warning disable RS1030
             foreach (var tree in compilationContext.Compilation.SyntaxTrees)
             {
                 var model = compilationContext.Compilation.GetSemanticModel(tree);
@@ -76,13 +79,13 @@ public class RequiresValidationAnalyzer : DiagnosticAnalyzer
                     var firstArg = attr.ArgumentList?.Arguments.FirstOrDefault();
                     if (firstArg != null)
                     {
-                        // Try to get the constant value (works for both literals and constants)
                         var constantValue = model.GetConstantValue(firstArg.Expression);
                         if (constantValue.HasValue && constantValue.Value is string ruleKey)
                             validatedKeys.TryAdd(ruleKey, 0);
                     }
                 }
             }
+#pragma warning restore RS1030
 
             // --- COLLECT REQUIRED RULES ---
             compilationContext.RegisterSymbolAction(symbolContext =>

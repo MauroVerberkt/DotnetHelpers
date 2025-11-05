@@ -21,7 +21,7 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(jsonFilesWithCompilation, (spc, input) =>
         {
-            var (jsonData, compilation) = input;
+            var (jsonData, _) = input;
             try
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
