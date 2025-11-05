@@ -1,18 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPackable>true</IsPackable>
+        <PackageId>BusinessRulesManagement.Package</PackageId>
         <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeSymbols>false</IncludeSymbols>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" />
-        <ProjectReference Include="..\..\src\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" />
+        <ProjectReference Include="..\..\src\BusinessRules\BusinessRules.csproj" PrivateAssets="none" />
+        <ProjectReference Include="..\..\src\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" Pack="false" />
+        <ProjectReference Include="..\..\src\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" Pack="false" />
+        <ProjectReference Include="..\..\src\BusinessRulesGenerator\BusinessRulesGenerator.csproj" Pack="false" />
     </ItemGroup>
 
     <ItemGroup>
-        <Analyzer Include="$(MSBuildProjectDirectory)\..\..\src\BusinessRulesAnalyzer\bin\$(Configuration)\netstandard2.0\BusinessRulesAnalyzer.dll" />
-        <Analyzer Include="$(MSBuildProjectDirectory)\..\..\src\BusinessRulesFixProvider\bin\$(Configuration)\netstandard2.0\BusinessRulesFixProvider.dll" />
+        <None Include="..\..\src\BusinessRulesAnalyzer\bin\$(Configuration)\netstandard2.0\BusinessRulesAnalyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="..\..\src\BusinessRulesFixProvider\bin\$(Configuration)\netstandard2.0\BusinessRulesFixProvider.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="..\..\src\BusinessRulesGenerator\bin\$(Configuration)\netstandard2.0\BusinessRulesGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
 
 </Project>
