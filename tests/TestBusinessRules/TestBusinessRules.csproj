@@ -8,16 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BusinessRules\BusinessRules.csproj" />
-    <ProjectReference Include="..\..\src\BusinessRulesGenerator\BusinessRulesGenerator.csproj" 
-                      OutputItemType="Analyzer" 
-                      ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\src\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" 
-                      OutputItemType="Analyzer" 
-                      ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\src\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" 
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
+    <PackageReference Include="BusinessRulesManagement.Package" Version="*" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -42,17 +42,18 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
         if (semanticModel == null)
             return;
 
-        var ruleKey = TryExtractRuleKey(throwStatement, semanticModel);
+        var (ruleKey, className) = TryExtractRuleInfo(throwStatement, semanticModel);
 
         context.RegisterCodeFix(
             CodeAction.Create(
-                title: ruleKey != null ? $"Add [ImplementsBusinessRule(\"{ruleKey}\")]" : Title,
-                createChangedDocument: c => AddValidatesAttributeAsync(context.Document, methodDeclaration, ruleKey, c),
+                title: className != null ? $"Add [ImplementsBusinessRule({className}.Key)]" : 
+                       ruleKey != null ? $"Add [ImplementsBusinessRule(\"{ruleKey}\")]" : Title,
+                createChangedDocument: c => AddValidatesAttributeAsync(context.Document, methodDeclaration, ruleKey, className, c),
                 equivalenceKey: Title),
             diagnostic);
     }
 
-    private string? TryExtractRuleKey(ThrowStatementSyntax throwStatement, SemanticModel semanticModel)
+    private (string? ruleKey, string? className) TryExtractRuleInfo(ThrowStatementSyntax throwStatement, SemanticModel semanticModel)
     {
         // Handle: throw SomeRule.ToException() or throw SomeRule.ToFaultException()
         if (throwStatement.Expression is InvocationExpressionSyntax invocation &&
@@ -63,21 +64,21 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
             {
                 var keyField = typeSymbol.GetMembers("Key").OfType<IFieldSymbol>().FirstOrDefault();
                 if (keyField?.ConstantValue is string key)
-                    return key;
+                    return (key, typeSymbol.Name);
             }
         }
 
         // Handle: throw new BusinessRuleException(...)
         if (throwStatement.Expression is not ObjectCreationExpressionSyntax objectCreation)
-            return null;
+            return (null, null);
 
         var firstArg = objectCreation.ArgumentList?.Arguments.FirstOrDefault();
         if (firstArg == null)
-            return null;
+            return (null, null);
 
         var constantValue = semanticModel.GetConstantValue(firstArg.Expression);
         if (constantValue.HasValue && constantValue.Value is string ruleKey)
-            return ruleKey;
+            return (ruleKey, null);
 
         if (firstArg.Expression is MemberAccessExpressionSyntax memberAccessArg &&
             memberAccessArg.Name.Identifier.Text == "Key")
@@ -87,25 +88,46 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
             {
                 var fieldValue = fieldSymbol.ConstantValue;
                 if (fieldValue is string key)
-                    return key;
+                    return (key, fieldSymbol.ContainingType?.Name);
             }
         }
 
-        return null;
+        return (null, null);
     }
 
     private async Task<Document> AddValidatesAttributeAsync(
         Document document,
         MethodDeclarationSyntax methodDeclaration,
         string? ruleKey,
+        string? className,
         CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root == null)
             return document;
 
-        var attributeList = ruleKey != null
-            ? SyntaxFactory.AttributeList(
+        AttributeListSyntax attributeList;
+        
+        if (className != null)
+        {
+            // Generate: [ImplementsBusinessRule(ClassName.Key)]
+            var memberAccess = SyntaxFactory.MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                SyntaxFactory.IdentifierName(className),
+                SyntaxFactory.IdentifierName("Key"));
+                
+            attributeList = SyntaxFactory.AttributeList(
+                SyntaxFactory.SingletonSeparatedList(
+                    SyntaxFactory.Attribute(
+                        SyntaxFactory.IdentifierName("ImplementsBusinessRule"),
+                        SyntaxFactory.AttributeArgumentList(
+                            SyntaxFactory.SingletonSeparatedList(
+                                SyntaxFactory.AttributeArgument(memberAccess))))));
+        }
+        else if (ruleKey != null)
+        {
+            // Generate: [ImplementsBusinessRule("RULE_KEY")]
+            attributeList = SyntaxFactory.AttributeList(
                 SyntaxFactory.SingletonSeparatedList(
                     SyntaxFactory.Attribute(
                         SyntaxFactory.IdentifierName("ImplementsBusinessRule"),
@@ -114,11 +136,16 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
                                 SyntaxFactory.AttributeArgument(
                                     SyntaxFactory.LiteralExpression(
                                         SyntaxKind.StringLiteralExpression,
-                                        SyntaxFactory.Literal(ruleKey))))))))
-            : SyntaxFactory.AttributeList(
+                                        SyntaxFactory.Literal(ruleKey))))))));
+        }
+        else
+        {
+            // Generate: [ImplementsBusinessRule]
+            attributeList = SyntaxFactory.AttributeList(
                 SyntaxFactory.SingletonSeparatedList(
                     SyntaxFactory.Attribute(
                         SyntaxFactory.IdentifierName("ImplementsBusinessRule"))));
+        }
 
         var leadingTrivia = methodDeclaration.GetLeadingTrivia();
         var attributeWithTrivia = attributeList.WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);

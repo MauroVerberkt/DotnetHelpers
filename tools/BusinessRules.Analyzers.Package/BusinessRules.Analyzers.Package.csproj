@@ -10,16 +10,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\BusinessRules\BusinessRules.csproj" PrivateAssets="none" />
-        <ProjectReference Include="..\..\src\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" Pack="false" />
-        <ProjectReference Include="..\..\src\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" Pack="false" />
-        <ProjectReference Include="..\..\src\BusinessRulesGenerator\BusinessRulesGenerator.csproj" Pack="false" />
+        <ProjectReference Include="..\..\src\BusinessRules\BusinessRules.csproj" PrivateAssets="all" Pack="false" />
+        <ProjectReference Include="..\..\src\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj" PrivateAssets="all" Pack="false" />
+        <ProjectReference Include="..\..\src\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj" PrivateAssets="all" Pack="false" />
+        <ProjectReference Include="..\..\src\BusinessRulesGenerator\BusinessRulesGenerator.csproj" PrivateAssets="all" Pack="false" />
     </ItemGroup>
 
     <ItemGroup>
         <None Include="..\..\src\BusinessRulesAnalyzer\bin\$(Configuration)\netstandard2.0\BusinessRulesAnalyzer.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
         <None Include="..\..\src\BusinessRulesFixProvider\bin\$(Configuration)\netstandard2.0\BusinessRulesFixProvider.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
         <None Include="..\..\src\BusinessRulesGenerator\bin\$(Configuration)\netstandard2.0\BusinessRulesGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="..\..\src\BusinessRules\bin\$(Configuration)\net8.0\BusinessRules.dll" Pack="true" PackagePath="lib/net8.0" Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="schemas\businessrules-schema.json" Pack="true" PackagePath="schemas\" />
+        <None Include="build\BusinessRulesManagement.Package.props" Pack="true" PackagePath="build\" />
     </ItemGroup>
 
 </Project>
