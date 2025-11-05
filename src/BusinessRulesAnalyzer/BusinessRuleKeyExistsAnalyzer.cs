@@ -42,9 +42,8 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
             var requiresAttrSymbol =
                 compilationContext.Compilation.GetTypeByMetadataName(
                     "BusinessRules.Attributes.BusinessRuleAttribute");
-            var businessRuleSymbol = compilationContext.Compilation.GetTypeByMetadataName("BusinessRules.BusinessRule");
 
-            if (validatesAttrSymbol == null || requiresAttrSymbol == null || businessRuleSymbol == null)
+            if (validatesAttrSymbol == null || requiresAttrSymbol == null)
                 return;
 
             var definedRuleKeys = new ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
