@@ -3,11 +3,13 @@
     "path": "DotnetHelpers.sln",
     "projects": [
       "src\\BusinessRules\\BusinessRules.csproj",
+      "src\\BusinessRules.ResultExtensions\\BusinessRules.ResultExtensions.csproj",
       "src\\BusinessRulesAnalyzer\\BusinessRulesAnalyzer.csproj",
       "src\\BusinessRulesGenerator\\BusinessRulesGenerator.csproj",
       "src\\BusinessRulesFixProvider\\BusinessRulesFixProvider.csproj",
       "tests\\BusinessRules.UnitTests\\BusinessRules.UnitTests.csproj",
-      "tests\\TestBusinessRules\\TestBusinessRules.csproj",
+      "tests\\BusinessRules.ResultExtensions.UnitTests\\BusinessRules.ResultExtensions.UnitTests.csproj",
+      "tests\\BusinessRules.IntegrationTests\\BusinessRules.IntegrationTests.csproj",
       "tools\\BusinessRules.Analyzers.Package\\BusinessRules.Analyzers.Package.csproj"
     ]
   }
