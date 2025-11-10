@@ -166,25 +166,25 @@ public class ThrowWithoutValidationTests
 {
     // VALID: Has [ImplementsBusinessRule] attribute
     [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
-    public void ValidCase_ThrowsWithAttribute_SOAP()
+    public void ValidCase_ThrowsWithAttribute()
     {
-        throw UserMustBeAuthenticated.ToFaultException();
+        throw UserMustBeAuthenticated.ToException();
     }
 
     [ImplementsBusinessRule(UserMustBeAdmin.Key)]
-    public void ValidCase_ThrowsWithAttribute_REST()
+    public void ValidCase_ThrowsWithAttribute_Alternative()
     {
         throw UserMustBeAdmin.ToException();
     }
 
     // ⚠️ BR004 WARNING - Missing [ImplementsBusinessRule] attribute
-    public void InvalidCase_ThrowsWithoutAttribute_SOAP()
+    public void InvalidCase_ThrowsWithoutAttribute()
     {
-        throw UserMustBeAuthenticated.ToFaultException();
+        throw UserMustBeAuthenticated.ToException();
     }
 
     // ⚠️ BR004 WARNING - Missing [ImplementsBusinessRule] attribute
-    public void InvalidCase_ThrowsWithoutAttribute_REST()
+    public void InvalidCase_ThrowsWithoutAttribute_Alternative()
     {
         throw UserMustBeAdmin.ToException();
     }

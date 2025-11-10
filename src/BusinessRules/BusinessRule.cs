@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using System.ServiceModel;
 
 namespace BusinessRules;
 
@@ -19,15 +18,6 @@ public abstract class BusinessRule<T>(string key, string rule, string descriptio
 
     [DataMember]
     internal override string InternalCategory { get; } = category;
-
-    public static FaultException<BusinessRuleFault> ToFaultException()
-    {
-        var instance = new T();
-        return new FaultException<BusinessRuleFault>(
-            new BusinessRuleFault(instance),
-            new FaultReason(instance.InternalRule),
-            new FaultCode(instance.InternalKey));
-    }
 
     public static BusinessRuleViolationException ToException()
     {

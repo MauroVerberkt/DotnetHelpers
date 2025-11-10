@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.2"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessRules\BusinessRules.csproj" />
+  </ItemGroup>
+
+</Project>

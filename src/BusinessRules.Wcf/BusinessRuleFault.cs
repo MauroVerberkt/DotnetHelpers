@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace BusinessRules;
+namespace BusinessRules.Wcf;
 
 [DataContract]
 public record BusinessRuleFault(

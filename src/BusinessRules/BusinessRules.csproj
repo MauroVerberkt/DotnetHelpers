@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.2"/>
+    <InternalsVisibleTo Include="BusinessRules.Wcf" />
+    <InternalsVisibleTo Include="BusinessRules.Wcf.UnitTests" />
   </ItemGroup>
 
 </Project>

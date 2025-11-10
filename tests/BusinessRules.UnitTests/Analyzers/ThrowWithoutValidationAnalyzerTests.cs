@@ -29,28 +29,6 @@ public class ThrowWithoutValidationAnalyzerTests
     }
 
     [Test]
-    public async Task ThrowBusinessRuleFault_WithAttribute_NoDiagnostic()
-    {
-        var test = """
-            using BusinessRules;
-            using BusinessRules.Attributes;
-            using BusinessRules.Rules.Authentication;
-            using System.ServiceModel;
-
-            public class TestClass
-            {
-                [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
-                public void ValidateAuth()
-                {
-                    throw UserMustBeAuthenticated.ToFaultException();
-                }
-            }
-            """;
-
-        await CSharpAnalyzerVerifier<ThrowWithoutValidationAnalyzer>.VerifyAnalyzerWithGeneratedCodeAsync(test);
-    }
-
-    [Test]
     public async Task ThrowBusinessRuleException_WithoutAttribute_ReportsWarning()
     {
         var test = """
@@ -62,32 +40,6 @@ public class ThrowWithoutValidationAnalyzerTests
                 public void SomeMethod()
                 {
                     {|#0:throw UserMustBeAuthenticated.ToException();|}
-                }
-            }
-            """;
-
-        var expected = CSharpAnalyzerVerifier<ThrowWithoutValidationAnalyzer>
-            .Diagnostic("BR004")
-            .WithLocation(0)
-            .WithArguments("SomeMethod")
-            .WithSeverity(DiagnosticSeverity.Warning);
-
-        await CSharpAnalyzerVerifier<ThrowWithoutValidationAnalyzer>.VerifyAnalyzerWithGeneratedCodeAsync(test, expected);
-    }
-
-    [Test]
-    public async Task ThrowFaultException_WithoutAttribute_ReportsWarning()
-    {
-        var test = """
-            using BusinessRules;
-            using BusinessRules.Rules.Authentication;
-            using System.ServiceModel;
-
-            public class TestClass
-            {
-                public void SomeMethod()
-                {
-                    {|#0:throw UserMustBeAuthenticated.ToFaultException();|}
                 }
             }
             """;
