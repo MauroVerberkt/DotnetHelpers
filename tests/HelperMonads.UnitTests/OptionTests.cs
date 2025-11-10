@@ -1,7 +1,7 @@
 using HelperMonads.Option;
 using Moq;
 
-namespace HelperMonadsTests;
+namespace HelperMonads.UnitTests;
 
 /// <summary>
 /// Tests for the <see cref="Option{TValue}" /> class, which represents an optional value that may or may not be present.

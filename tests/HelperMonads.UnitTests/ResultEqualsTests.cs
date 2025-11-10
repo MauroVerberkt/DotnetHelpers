@@ -1,6 +1,6 @@
 using HelperMonads.Result;
 
-namespace HelperMonadsTests;
+namespace HelperMonads.UnitTests;
 
 /// <summary>
 /// Contains unit tests for the <c>Equals</c> method of the <see cref="Result{T}" /> class.

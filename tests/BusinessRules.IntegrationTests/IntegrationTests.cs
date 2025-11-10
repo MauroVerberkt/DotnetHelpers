@@ -1,12 +1,12 @@
+using System.Collections.Immutable;
+using System.Reflection;
+using BusinessRulesAnalyzer;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.Diagnostics;
-using BusinessRulesAnalyzer;
-using System.Reflection;
-using System.Collections.Immutable;
+using Microsoft.CodeAnalysis.Text;
 
-namespace TestBusinessRules;
+namespace BusinessRules.IntegrationTests;
 
 [TestFixture]
 public class IntegrationTests

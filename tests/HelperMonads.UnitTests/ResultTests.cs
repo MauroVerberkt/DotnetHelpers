@@ -1,6 +1,6 @@
 using HelperMonads.Result;
 
-namespace HelperMonadsTests;
+namespace HelperMonads.UnitTests;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Result{TData}" /> class, which represents the result of an operation that may either
@@ -28,7 +28,7 @@ public class ResultTests
     public void Success_ShouldCreateSuccessResult_WithSuccessMessage()
     {
         // Act
-        var result =  Result.Success(SuccessMessage);
+        var result =  Result.Result.Success(SuccessMessage);
 
         Assert.Multiple(() =>
         {
@@ -46,7 +46,7 @@ public class ResultTests
     public void Failure_ShouldCreateFailureResult_WithErrorOnly()
     {
         // Act
-        var result = Result.Failure<string>(TestException);
+        var result = Result.Result.Failure<string>(TestException);
 
         Assert.Multiple(() =>
         {

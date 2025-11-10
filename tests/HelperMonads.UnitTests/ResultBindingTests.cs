@@ -1,6 +1,6 @@
 using HelperMonads.Result;
 
-namespace HelperMonadsTests;
+namespace HelperMonads.UnitTests;
 
 /// <summary>
 /// Contains unit tests for various binding operations on the <see cref="Result{T}" /> class.

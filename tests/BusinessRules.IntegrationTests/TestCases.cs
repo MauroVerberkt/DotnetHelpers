@@ -1,10 +1,10 @@
 using BusinessRules.Attributes;
 using BusinessRules.Rules.Authentication;
 using BusinessRules.Rules.Authorization;
-using BusinessRules.Rules.Validation;
 using BusinessRules.Rules.General;
+using BusinessRules.Rules.Validation;
 
-namespace TestBusinessRules;
+namespace BusinessRules.IntegrationTests;
 
 // ============================================
 // VALIDATORS (define these first)
