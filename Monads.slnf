@@ -3,7 +3,8 @@
     "path": "DotnetHelpers.sln",
     "projects": [
       "src\\HelperMonads\\HelperMonads.csproj",
-      "tests\\HelperMonadsTests\\HelperMonadsTests.csproj"
+      "tests\\HelperMonads.UnitTests\\HelperMonads.UnitTests.csproj",
+      "tools\\HelperMonads.Package\\HelperMonads.Package.csproj"
     ]
   }
 }
