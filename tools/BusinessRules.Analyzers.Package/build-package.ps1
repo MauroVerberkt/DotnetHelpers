@@ -7,7 +7,7 @@ $outputDir = "$PSScriptRoot\bin\packages"
 
 $packages = @(
     @{
-        Name = "BusinessRulesManagement.Package"
+        Name = "BusinessRulesManagement"
         Path = "$PSScriptRoot\BusinessRules.Analyzers.Package.csproj"
         Description = "Core BusinessRules with analyzers and source generators"
     },
