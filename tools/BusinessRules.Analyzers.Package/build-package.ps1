@@ -10,6 +10,12 @@ $packages = @(
         Name = "BusinessRulesManagement"
         Path = "$PSScriptRoot\BusinessRules.Analyzers.Package.csproj"
         Description = "Core BusinessRules with analyzers and source generators"
+        PreBuild = @(
+            "$repoRoot\src\BusinessRules\BusinessRules.csproj",
+            "$repoRoot\src\BusinessRulesAnalyzer\BusinessRulesAnalyzer.csproj",
+            "$repoRoot\src\BusinessRulesFixProvider\BusinessRulesFixProvider.csproj",
+            "$repoRoot\src\BusinessRulesGenerator\BusinessRulesGenerator.csproj"
+        )
     },
     @{
         Name = "BusinessRulesManagement.ResultExtensions"
@@ -37,6 +43,23 @@ foreach ($package in $packages) {
     
     Write-Host "Cleaning..." -ForegroundColor DarkYellow
     dotnet clean $package.Path --configuration Release --verbosity quiet
+    
+    if ($package.PreBuild) {
+        Write-Host "Building dependencies..." -ForegroundColor DarkYellow
+        $preBuildFailed = $false
+        foreach ($preBuildProject in $package.PreBuild) {
+            dotnet build $preBuildProject --configuration Release --verbosity quiet
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "[FAILED] $($package.Name) dependency failed to build" -ForegroundColor Red
+                $failureCount++
+                $preBuildFailed = $true
+                break
+            }
+        }
+        if ($preBuildFailed) {
+            continue
+        }
+    }
     
     Write-Host "Packing..." -ForegroundColor DarkYellow
     dotnet pack $package.Path --configuration Release --output $outputDir --verbosity quiet

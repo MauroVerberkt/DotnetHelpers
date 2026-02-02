@@ -2,19 +2,16 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <IsPackable>true</IsPackable>
-        <PackageId>HelperMonads.Package</PackageId>
+        <PackageId>HelperMonads</PackageId>
         <Title>Helper Monads</Title>
         <Description>Functional programming monads for C# including Result and Option types</Description>
         <Authors>Mauro Verberkt</Authors>
         <PackageTags>monad;result;option;functional;railway</PackageTags>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <IncludeSymbols>false</IncludeSymbols>
+        <DevelopmentDependency>true</DevelopmentDependency>
         <NoWarn>$(NoWarn);NU5128</NoWarn>
     </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\HelperMonads\HelperMonads.csproj" PrivateAssets="all" Pack="false" />
-    </ItemGroup>
 
     <ItemGroup>
         <None Include="..\..\src\HelperMonads\bin\$(Configuration)\net8.0\HelperMonads.dll" Pack="true" PackagePath="lib/net8.0" Visible="false" />
