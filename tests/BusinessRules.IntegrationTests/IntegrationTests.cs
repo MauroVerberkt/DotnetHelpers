@@ -68,7 +68,7 @@ public class IntegrationTests
         {
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(BusinessRules.BusinessRule<>).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(BusinessRule<>).Assembly.Location),
             MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location),
             MetadataReference.CreateFromFile(Assembly.Load("System.Collections").Location),
             MetadataReference.CreateFromFile(Assembly.Load("netstandard").Location),
@@ -85,7 +85,7 @@ public class IntegrationTests
 
         var compilation = CSharpCompilation.Create(
             "TestAssembly",
-            new[] { syntaxTree },
+            [syntaxTree],
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -97,13 +97,14 @@ public class IntegrationTests
         var compilation = CreateCompilation(source);
 
         var compilationWithAnalyzers = compilation.WithAnalyzers(
-            ImmutableArray.Create(analyzers),
+            [..analyzers],
             new AnalyzerOptions(
-                ImmutableArray.Create<AdditionalText>(
-                    new InMemoryAdditionalText("Test.BusinessRules.json", TestBusinessRulesJson))));
+            [
+                new InMemoryAdditionalText("Test.BusinessRules.json", TestBusinessRulesJson)
+            ]));
 
         var diagnostics = await compilationWithAnalyzers.GetAllDiagnosticsAsync();
-        return diagnostics.Where(d => d.Severity >= DiagnosticSeverity.Warning).ToImmutableArray();
+        return [..diagnostics.Where(d => d.Severity >= DiagnosticSeverity.Warning)];
     }
 
     [Test]
