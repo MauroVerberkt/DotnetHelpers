@@ -1,8 +1,8 @@
 using BusinessRules.Attributes;
-using BusinessRules.Rules.Authentication;
-using BusinessRules.Rules.Authorization;
-using BusinessRules.Rules.General;
-using BusinessRules.Rules.Validation;
+using BusinessRulesIntegrationTests. BusinessRules.Rules.Authentication;
+using BusinessRulesIntegrationTests.BusinessRules.Rules.Authorization;
+using BusinessRulesIntegrationTests.BusinessRules.Rules.General;
+using BusinessRulesIntegrationTests.BusinessRules.Rules.Validation;
 
 namespace BusinessRules.IntegrationTests;
 

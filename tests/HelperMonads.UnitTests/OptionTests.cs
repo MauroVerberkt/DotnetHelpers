@@ -14,7 +14,7 @@ namespace HelperMonads.UnitTests;
 [TestFixture]
 public class OptionTests
 {
-     private const string ValidValue = "TestValue";
+    private const string ValidValue = "TestValue";
     private const string? NullValue = null;
     private const string NoValueString = "No Value";
 
