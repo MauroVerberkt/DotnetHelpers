@@ -457,6 +457,68 @@ public class ResultTests
     }
     
     /// <summary>
+    /// Tests that <see cref="Result{TData}.Tap(Action{Result{TData}})" /> executes the action when the result is a success.
+    /// </summary>
+    [Test]
+    public void Tap_ShouldExecuteAction_WhenResultIsSuccess()
+    {
+        // Arrange
+        var successResult = Result<string>.Success(SuccessMessage);
+        var actionExecuted = false;
+
+        // Act
+        successResult.Tap(Action);
+
+        // Assert
+        Assert.That(actionExecuted, Is.True);
+        return;
+
+        void Action(Result<string> result)
+        {
+            actionExecuted = true;
+        }
+    }
+
+    /// <summary>
+    /// Tests that <see cref="Result{TData}.Tap(Action{Result{TData}})" /> executes the action when the result is a failure.
+    /// </summary>
+    [Test]
+    public void Tap_ShouldExecuteAction_WhenResultIsFailure()
+    {
+        // Arrange
+        var failureResult = Result<string>.Failure(TestException);
+        var actionExecuted = false;
+
+        // Act
+        failureResult.Tap(Action);
+
+        // Assert
+        Assert.That(actionExecuted, Is.True);
+        return;
+
+        void Action(Result<string> result)
+        {
+            actionExecuted = true;
+        }
+    }
+
+    /// <summary>
+    /// Tests that <see cref="Result{TData}.Tap(Action{Result{TData}})" /> returns the same result instance.
+    /// </summary>
+    [Test]
+    public void Tap_ShouldReturnSameResultInstance()
+    {
+        // Arrange
+        var successResult = Result<string>.Success(SuccessMessage);
+
+        // Act
+        var returnedResult = successResult.Tap(_ => { });
+
+        // Assert
+        Assert.That(returnedResult, Is.SameAs(successResult));
+    }
+
+    /// <summary>
     /// Tests that <see cref="Result{TData}.GetHashCode()" /> returns the same hash code for equal results.
     /// </summary>
     [Test]

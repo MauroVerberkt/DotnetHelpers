@@ -277,6 +277,18 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     }
 
     /// <summary>
+    /// Executes an action regardless of whether the <see cref="Result{TData}" /> is successful or failed.
+    /// Useful for logging, tracing, or other side effects that should occur in both cases.
+    /// </summary>
+    /// <param name="action">The action to execute, receiving this result.</param>
+    /// <returns>This result.</returns>
+    public Result<TData> Tap(Action<Result<TData>> action)
+    {
+        action(this);
+        return this;
+    }
+
+    /// <summary>
     /// Deconstructs the current <see cref="Result{TData}" /> instance into its individual components:
     /// success status, associated data, and any error that occurred.
     /// </summary>

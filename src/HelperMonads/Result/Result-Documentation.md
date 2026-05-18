@@ -36,6 +36,7 @@ The `Result<TData>` class supports the following:
 - `BindAndTransformAsync`: Chains and transforms the current result asynchronously, passing through the `Data` if the operation is successful.
 - `OnSuccess`: Executes an action if the operation was successful.
 - `OnFailure`: Executes an action if the operation was a failure.
+- `Tap`: Executes an action regardless of success or failure, useful for logging or tracing.
 - `Deconstruct`: Deconstructs the result into its components (`IsSuccess`, `Data`, and `Error`).
 - **Success Creation**: Use `Result<TData>.Success(data)` to create a successful result.
 - **Failure Creation**: Use `Result<TData>.Failure(error)` to represent a failure with an exception.
