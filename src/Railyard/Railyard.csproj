@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\tools\HelperMonads.Package\HelperMonads.Package.csproj" />
+        <ProjectReference Include="..\HelperMonads\HelperMonads.csproj" />
+    </ItemGroup>
+
+</Project>

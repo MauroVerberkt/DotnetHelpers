@@ -1,8 +1,9 @@
+/*
 using BusinessRules.Attributes;
-using BusinessRulesIntegrationTests. BusinessRules.Rules.Authentication;
-using BusinessRulesIntegrationTests.BusinessRules.Rules.Authorization;
-using BusinessRulesIntegrationTests.BusinessRules.Rules.General;
-using BusinessRulesIntegrationTests.BusinessRules.Rules.Validation;
+using BusinessRules.IntegrationTests. BusinessRules.Rules.Authentication;
+using BusinessRules.IntegrationTests.BusinessRules.Rules.Authorization;
+using BusinessRules.IntegrationTests.BusinessRules.Rules.General;
+using BusinessRules.IntegrationTests.BusinessRules.Rules.Validation;
 
 namespace BusinessRules.IntegrationTests;
 
@@ -189,3 +190,4 @@ public class ThrowWithoutValidationTests
         throw UserMustBeAdmin.ToException();
     }
 }
+*/

@@ -83,7 +83,7 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
         var sb = new StringBuilder();
         foreach (var c in category)
         {
-            if (char.IsLetterOrDigit(c))
+            if (c == '.' || char.IsLetterOrDigit(c))
                 sb.Append(c);
         }
         

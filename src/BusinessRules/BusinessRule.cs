@@ -8,7 +8,7 @@ namespace BusinessRules;
 [SuppressMessage(
     category: "Design",
     checkId: "CA1000:Do not declare static members on generic types",
-    Justification = "Intentional CRTP pattern: static members are per concrete BusinessRule type.")]
+    Justification = "Intentional CRTP-style pattern: static members are used to provide type-safe, rule-specific factory methods per closed generic type.")]
 public abstract class BusinessRule<T>(string key, string rule, string description = "", string category = "") : BusinessRuleBase
     where T : BusinessRule<T>, new()
 {
