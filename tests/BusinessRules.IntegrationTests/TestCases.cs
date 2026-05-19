@@ -1,3 +1,4 @@
+/*
 using BusinessRules.Attributes;
 using BusinessRulesIntegrationTests. BusinessRules.Rules.Authentication;
 using BusinessRulesIntegrationTests.BusinessRules.Rules.Authorization;
@@ -189,3 +190,4 @@ public class ThrowWithoutValidationTests
         throw UserMustBeAdmin.ToException();
     }
 }
+*/

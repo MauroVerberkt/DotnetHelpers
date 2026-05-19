@@ -2,23 +2,34 @@
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$outputDir = "$PSScriptRoot\bin\packages"
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$outputDir = "$repoRoot\packages"
 
 $packages = @(
     @{
-        Name = "HelperMonads"
-        Path = "$PSScriptRoot\HelperMonads.Package.csproj"
-        Description = "Functional programming monads for C# including Result and Option types"
-        PreBuild = @(
-            "$repoRoot\src\HelperMonads\HelperMonads.csproj"
-        )
+        Name = "BusinessRulesManagement"
+        Path = "$repoRoot\src\BusinessRules\BusinessRules.csproj"
+        Description = "Core BusinessRules with analyzers and source generators"
+    },
+    @{
+        Name = "BusinessRulesManagement.ResultExtensions"
+        Path = "$repoRoot\src\BusinessRules.ResultExtensions\BusinessRules.ResultExtensions.csproj"
+        Description = "Result monad integration for BusinessRules"
+    },
+    @{
+        Name = "BusinessRulesManagement.Wcf"
+        Path = "$repoRoot\src\BusinessRules.Wcf\BusinessRules.Wcf.csproj"
+        Description = "WCF integration for BusinessRules"
     }
 )
 
-Write-Host "Building HelperMonads Packages..." -ForegroundColor Cyan
+Write-Host "Building BusinessRules Packages..." -ForegroundColor Cyan
 Write-Host "Output directory: $outputDir" -ForegroundColor Gray
 Write-Host ""
+
+if (-not (Test-Path $outputDir)) {
+    New-Item -ItemType Directory -Path $outputDir | Out-Null
+}
 
 $successCount = 0
 $failureCount = 0
@@ -28,28 +39,8 @@ foreach ($package in $packages) {
     Write-Host "Building: $($package.Name)" -ForegroundColor Yellow
     Write-Host "Description: $($package.Description)" -ForegroundColor Gray
     
-    Write-Host "Cleaning..." -ForegroundColor DarkYellow
-    dotnet clean $package.Path --configuration Release --verbosity quiet
-    
-    if ($package.PreBuild) {
-        Write-Host "Building dependencies..." -ForegroundColor DarkYellow
-        $preBuildFailed = $false
-        foreach ($preBuildProject in $package.PreBuild) {
-            dotnet build $preBuildProject --configuration Release --verbosity quiet
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "[FAILED] $($package.Name) dependency failed to build" -ForegroundColor Red
-                $failureCount++
-                $preBuildFailed = $true
-                break
-            }
-        }
-        if ($preBuildFailed) {
-            continue
-        }
-    }
-    
-    Write-Host "Packing..." -ForegroundColor DarkYellow
-    dotnet pack $package.Path --configuration Release --output $outputDir --verbosity quiet
+    Write-Host "Building and packing..." -ForegroundColor DarkYellow
+    dotnet pack $package.Path --configuration Release --output $outputDir
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "[SUCCESS] $($package.Name) created successfully" -ForegroundColor Green
@@ -69,7 +60,7 @@ Write-Host "  Failed:    $failureCount" -ForegroundColor $(if ($failureCount -gt
 if ($successCount -gt 0) {
     Write-Host ""
     Write-Host "Created packages in: $outputDir" -ForegroundColor Cyan
-    Get-ChildItem -Path $outputDir -Filter "*.nupkg" | Sort-Object LastWriteTime -Descending | ForEach-Object {
+    Get-ChildItem -Path $outputDir -Filter "BusinessRules*.nupkg" | Sort-Object LastWriteTime -Descending | ForEach-Object {
         Write-Host "  - $($_.Name)" -ForegroundColor Green
     }
 }
@@ -81,4 +72,4 @@ if ($failureCount -gt 0) {
 }
 
 Write-Host ""
-Write-Host "All packages built successfully!" -ForegroundColor Green
+Write-Host "All BusinessRules packages built successfully!" -ForegroundColor Green
