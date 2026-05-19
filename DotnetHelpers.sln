@@ -48,6 +48,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRules.Wcf", "src\Bu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRules.Wcf.UnitTests", "tests\BusinessRules.Wcf.UnitTests\BusinessRules.Wcf.UnitTests.csproj", "{0D7D3980-91B8-49B6-9CE6-7ED563C7BA7A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{29D12269-789D-48C1-9964-CC10B7B57C57}"
+	ProjectSection(SolutionItems) = preProject
+		tools\build-businessrules.ps1 = tools\build-businessrules.ps1
+		tools\build-monads.ps1 = tools\build-monads.ps1
+	EndProjectSection
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
