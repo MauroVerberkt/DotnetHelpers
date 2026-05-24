@@ -1,0 +1,10 @@
+{
+  "label": "Monads",
+  "position": 2,
+  "collapsed": false,
+  "collapsible": true,
+  "link": {
+    "type": "generated-index",
+    "description": "Functional programming patterns for C#: Result and Option types."
+  }
+}

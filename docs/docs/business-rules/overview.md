@@ -1,0 +1,204 @@
+---
+sidebar_position: 1
+title: Overview
+description: Code generation-based framework for defining, managing, and enforcing business rules
+keywords:
+  - business rules
+  - source generator
+  - roslyn analyzer
+  - validation
+  - code generation
+  - json configuration
+---
+
+# BusinessRules Framework
+
+The **BusinessRules** framework is a code generation-based approach to defining, managing, and enforcing business rules throughout an application. It uses **Source Generators** to automatically create strongly-typed C# classes from JSON configuration files, making rules reusable, type-safe, and easily discoverable.
+
+## Key Capabilities
+
+- Define business rules in a declarative JSON format (single source of truth)
+- Automatically generate strongly-typed C# classes using Source Generators
+- Associate rules with methods and classes through attributes
+- Generate standardized exceptions when rules are violated
+- Compile-time validation of business rule keys through Roslyn Analyzers
+
+## Components
+
+### Core Classes
+
+#### BusinessRuleBase
+
+Abstract base class for all business rules with core properties:
+
+| Property | Description |
+|----------|-------------|
+| `InternalKey` | Unique identifier for the business rule |
+| `InternalRule` | Human-readable description of the rule |
+| `InternalDescription` | Optional detailed description |
+| `InternalCategory` | Optional category for organizing rules |
+
+#### BusinessRule&lt;T&gt;
+
+Generic abstract class using the self-referencing generic pattern (`where T : BusinessRule<T>, new()`) that provides:
+
+- **Constructor Parameters**: `key`, `rule`, `description`, `category`
+- **Static Methods**:
+  - `ToException()` - Creates a `BusinessRuleViolationException`
+  - `ToException(string message)` - Creates an exception with custom message
+
+#### BusinessRuleViolationException
+
+Custom exception encapsulating a violated business rule with properties: `BusinessRule`, `Key`, `Rule`, `Description`, `Category`.
+
+### Attributes
+
+| Attribute | Purpose |
+|-----------|---------|
+| `[BusinessRule(key)]` | Marks methods/classes as governed by a rule |
+| `[ImplementsBusinessRule(key)]` | Marks methods that implement (validate) a rule |
+
+### Roslyn Analyzers
+
+| Analyzer | Description |
+|----------|-------------|
+| `BR001` | Error: Referenced rule key doesn't exist in JSON |
+| `BR002` | Error: Rule is used but has no validator method |
+| `BR003` | Warning: `enforceValidation: false` used without validator |
+| `BR004` | Warning: Throwing business rule exception without `[ImplementsBusinessRule]` |
+
+## Usage
+
+### Step 1: Define Rules in JSON
+
+```json title="MyApp.BusinessRules.json"
+{
+  "$schema": "../schemas/businessrules-schema.json",
+  "businessRules": [
+    {
+      "className": "UserMustBeAdult",
+      "key": "USER_AGE_MIN",
+      "rule": "User must be at least 18 years old",
+      "description": "Users under 18 cannot create accounts due to legal requirements",
+      "category": "UserValidation"
+    },
+    {
+      "className": "PasswordMinLength",
+      "key": "PWD_MIN_LENGTH",
+      "rule": "Password must contain at least 8 characters",
+      "category": "Security"
+    }
+  ]
+}
+```
+
+### Step 2: Add to Project
+
+```xml title="MyApp.csproj"
+<ItemGroup>
+  <AdditionalFiles Include="MyApp.BusinessRules.json" />
+</ItemGroup>
+
+<ItemGroup>
+  <PackageReference Include="BusinessRulesManagement" Version="1.0.0" />
+</ItemGroup>
+```
+
+### Step 3: Use Generated Classes
+
+```csharp title="Validators.cs"
+using BusinessRules.Attributes;
+using BusinessRules.Rules.UserValidation;
+using BusinessRules.Rules.Security;
+
+public class Validators
+{
+    [ImplementsBusinessRule(UserMustBeAdult.Key)]
+    public void ValidateUserAge(int age)
+    {
+        if (age < 18)
+            throw UserMustBeAdult.ToException();
+    }
+
+    [ImplementsBusinessRule(PasswordMinLength.Key)]
+    public void ValidatePassword(string password)
+    {
+        if (password.Length < 8)
+            throw PasswordMinLength.ToException("Password is too short");
+    }
+}
+```
+
+```csharp title="UserService.cs"
+public class UserService
+{
+    private readonly Validators _validators = new();
+
+    [BusinessRule(UserMustBeAdult.Key)]
+    public void CreateUser(string username, int age, string password)
+    {
+        _validators.ValidateUserAge(age);
+        _validators.ValidatePassword(password);
+
+        Console.WriteLine($"User {username} created successfully");
+    }
+}
+```
+
+### Step 4: Handle Violations
+
+```csharp title="ErrorHandling.cs"
+try
+{
+    service.CreateUser("jane_doe", 16, "SecurePass123");
+}
+catch (BusinessRuleViolationException ex)
+{
+    Console.WriteLine($"Rule violated: {ex.Rule}");
+    // Output: User must be at least 18 years old
+    Console.WriteLine($"Key: {ex.Key}");
+    // Output: USER_AGE_MIN
+    Console.WriteLine($"Category: {ex.Category}");
+    // Output: UserValidation
+}
+```
+
+### Generated Code
+
+The source generator creates classes like:
+
+```csharp title="MyApp.BusinessRules.UserValidation.g.cs"
+// <auto-generated />
+using BusinessRules;
+
+namespace BusinessRules.Rules.UserValidation;
+
+public class UserMustBeAdult() : BusinessRule<UserMustBeAdult>(Key, Rule, Description, Category)
+{
+    public const string Key = "USER_AGE_MIN";
+    public const string Rule = "User must be at least 18 years old";
+    public const string Description = "Users under 18 cannot create accounts due to legal requirements";
+    public const string Category = "UserValidation";
+}
+```
+
+:::tip[Compile-Time Safety]
+
+The Roslyn analyzers validate that all business rule keys used in attributes exist in your JSON file. You'll get errors at compile time if you reference a non-existent rule.
+
+:::
+
+## Benefits
+
+- **Single Source of Truth**: All rules defined in one JSON file
+- **Code Generation**: No manual coding of rule classes
+- **Compile-Time Validation**: Catch errors before runtime
+- **Type Safety**: Full IntelliSense support
+- **Rich Metadata**: Each violation carries full context for logging
+- **Maintainability**: Update rules in JSON without modifying source code
+
+## See Also
+
+- [Result Extensions](./result-extensions.md) - Functional validation without exceptions
+- [WCF Integration](./wcf-integration.md) - WCF fault exception support
+- [Quick Start](../getting-started/quick-start.md) - Basic usage examples

@@ -42,3 +42,8 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+
+# Docusaurus
+docs/node_modules/
+docs/build/
+docs/.docusaurus/
