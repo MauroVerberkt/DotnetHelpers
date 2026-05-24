@@ -1,0 +1,7 @@
+HelperMonads:
+  label: HelperMonads
+  description: Relates to the HelperMonads library (Result, Option)
+
+BusinessRules:
+  label: BusinessRules
+  description: Relates to the BusinessRules framework (rules, generators, analyzers)
