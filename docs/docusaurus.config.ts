@@ -104,7 +104,7 @@ const config: Config = {
             category: string;
           }> = [];
 
-          for (const category of ['decisions', 'design']) {
+          for (const category of ['proposals', 'decisions', 'design']) {
             const dirPath = path.join(architecturePath, category);
             if (!fs.existsSync(dirPath)) continue;
 
