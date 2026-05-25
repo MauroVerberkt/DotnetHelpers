@@ -6,7 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HelperMonads.Result;
+namespace HelperMonads;
 
 /// <summary>
 /// Represents the result of an operation, indicating success or failure, along with additional information.

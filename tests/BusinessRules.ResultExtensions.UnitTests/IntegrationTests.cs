@@ -1,4 +1,4 @@
-using HelperMonads.Result;
+using HelperMonads;
 
 namespace BusinessRules.ResultExtensions.UnitTests;
 

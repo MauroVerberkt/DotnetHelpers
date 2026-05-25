@@ -65,7 +65,8 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
                     try
                     {
                         var jsonDoc = JsonDocument.Parse(jsonText.ToString());
-                        if (jsonDoc.RootElement.TryGetProperty("businessRules", out var rulesArray) &&
+                        if ((jsonDoc.RootElement.TryGetProperty("businessRules", out var rulesArray) ||
+                             jsonDoc.RootElement.TryGetProperty("BusinessRules", out rulesArray)) &&
                             rulesArray.ValueKind == JsonValueKind.Array)
                         {
                             foreach (var rule in rulesArray.EnumerateArray())

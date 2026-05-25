@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace HelperMonads.Option;
+namespace HelperMonads;
 
 /// <summary>
 /// Represents an option that contains no value.
