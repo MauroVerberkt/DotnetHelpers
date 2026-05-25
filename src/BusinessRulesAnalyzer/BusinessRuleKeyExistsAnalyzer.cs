@@ -56,7 +56,7 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
             var reportedKeys = new ConcurrentDictionary<(FileLinePositionSpan, string), byte>();
 
             // --- READ BUSINESS RULES FROM JSON FILE ---
-            var jsonFile = compilationContext.Options.AdditionalFiles.FirstOrDefault(f => f.Path.EndsWith("BusinessRules.json"));
+            var jsonFile = compilationContext.Options.AdditionalFiles.FirstOrDefault(f => f.Path.EndsWith("BusinessRules.json", StringComparison.OrdinalIgnoreCase));
             if (jsonFile != null)
             {
                 var jsonText = jsonFile.GetText(compilationContext.CancellationToken);
@@ -65,12 +65,12 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
                     try
                     {
                         var jsonDoc = JsonDocument.Parse(jsonText.ToString());
-                        if (jsonDoc.RootElement.TryGetProperty("businessRules", out var rulesArray) &&
+                        if (jsonDoc.RootElement.TryGetPropertyIgnoreCase("BusinessRules", out var rulesArray) &&
                             rulesArray.ValueKind == JsonValueKind.Array)
                         {
                             foreach (var rule in rulesArray.EnumerateArray())
                             {
-                                if (rule.TryGetProperty("key", out var keyProp) &&
+                                if (rule.TryGetPropertyIgnoreCase("key", out var keyProp) &&
                                     keyProp.ValueKind == JsonValueKind.String)
                                 {
                                     definedRuleKeys.TryAdd(keyProp.GetString()!, 0);

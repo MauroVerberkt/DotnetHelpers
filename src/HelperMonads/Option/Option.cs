@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HelperMonads.Option;
+namespace HelperMonads;
 
 /// <summary>
 /// Represents an abstract base class for an option that contains a value or is empty.
@@ -16,7 +16,7 @@ public abstract class Option<TValue>
     /// Gets an instance representing no value.
     /// </summary>
     [Pure]
-    public static Option<TValue> None => new None<TValue>();
+    public static Option<TValue> None { get; } = new None<TValue>();
 
     /// <summary>
     /// Gets a value indicating whether the option contains a value.

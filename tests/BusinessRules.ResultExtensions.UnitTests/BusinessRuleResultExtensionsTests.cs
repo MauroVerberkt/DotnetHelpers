@@ -1,4 +1,4 @@
-using HelperMonads.Result;
+using HelperMonads;
 
 namespace BusinessRules.ResultExtensions.UnitTests;
 
@@ -413,7 +413,7 @@ public class BusinessRuleResultExtensionsTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            value.ValidateAll(validations!));
+            _ = value.ValidateAll(validations!));
     }
 
     [Test]
@@ -436,7 +436,7 @@ public class BusinessRuleResultExtensionsTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            _ = value.ValidateAll((v => true, null!)));
+            _ = value.ValidateAll((_ => true, null!)));
     }
 
     [Test]
@@ -448,7 +448,7 @@ public class BusinessRuleResultExtensionsTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() =>
-            _ = value.ValidateAll((v => true, rule, "")));
+            _ = value.ValidateAll((_ => true, rule, "")));
     }
 
     [Test]

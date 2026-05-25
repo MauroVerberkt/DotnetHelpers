@@ -1,5 +1,3 @@
-using HelperMonads.Result;
-
 namespace HelperMonads.UnitTests;
 
 /// <summary>
@@ -28,7 +26,7 @@ public class ResultTests
     public void Success_ShouldCreateSuccessResult_WithSuccessMessage()
     {
         // Act
-        var result =  Result.Result.Success(SuccessMessage);
+        var result =  Result.Success(SuccessMessage);
 
         Assert.Multiple(() =>
         {
@@ -46,7 +44,7 @@ public class ResultTests
     public void Failure_ShouldCreateFailureResult_WithErrorOnly()
     {
         // Act
-        var result = Result.Result.Failure<string>(TestException);
+        var result = Result.Failure<string>(TestException);
 
         Assert.Multiple(() =>
         {

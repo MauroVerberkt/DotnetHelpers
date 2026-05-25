@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
-using HelperMonads.Result;
+using HelperMonads;
 
 namespace BusinessRules.ResultExtensions;
 
