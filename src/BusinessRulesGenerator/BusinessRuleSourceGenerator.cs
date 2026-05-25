@@ -8,9 +8,14 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace BusinessRulesGenerator;
 
+/// <summary>
+/// Incremental source generator that reads BusinessRules.json and emits strongly-typed
+/// business rule classes grouped by category.
+/// </summary>
 [Generator]
 public class BusinessRuleSourceGenerator : IIncrementalGenerator
 {
+    /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var jsonFilesWithCompilation = context.AdditionalTextsProvider
@@ -48,11 +53,11 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
 
                     foreach (var rule in categoryGroup)
                     {
-                        sourceBuilder.AppendLine($"public class {rule.ClassName}() : BusinessRule<{rule.ClassName}>(Key, Rule, Description, Category)");
+                        sourceBuilder.AppendLine($"public class {rule.ClassName}() : BusinessRule<{rule.ClassName}>(Key, Requirement, Description, Category)");
                         sourceBuilder.AppendLine("{");
                         sourceBuilder.AppendLine($"    public const string Key = \"{EscapeString(rule.Key)}\";");
                         sourceBuilder.AppendLine();
-                        sourceBuilder.AppendLine($"    public const string Rule = \"{EscapeString(rule.Rule)}\";");
+                        sourceBuilder.AppendLine($"    public const string Requirement = \"{EscapeString(rule.Requirement)}\";");
                         sourceBuilder.AppendLine();
                         sourceBuilder.AppendLine($"    public const string Description = \"{EscapeString(rule.Description)}\";");
                         sourceBuilder.AppendLine();
@@ -108,7 +113,7 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
     {
         public string ClassName { get; set; } = string.Empty;
         public string Key { get; set; } = string.Empty;
-        public string Rule { get; set; } = string.Empty;
+        public string Requirement { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
     }

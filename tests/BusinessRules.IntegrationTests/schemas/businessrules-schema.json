@@ -10,7 +10,7 @@
       "description": "List of business rule definitions",
       "items": {
         "type": "object",
-        "required": ["className", "key", "rule"],
+        "required": ["className", "key", "requirement"],
         "properties": {
           "className": {
             "type": "string",
@@ -23,9 +23,9 @@
             "description": "Unique identifier for the business rule (typically UPPER_SNAKE_CASE)",
             "minLength": 1
           },
-          "rule": {
+          "requirement": {
             "type": "string",
-            "description": "Human-readable description of the business rule",
+            "description": "Human-readable requirement statement for the business rule",
             "minLength": 1
           },
           "description": {

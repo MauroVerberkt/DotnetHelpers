@@ -34,7 +34,7 @@ Abstract base class for all business rules with core properties:
 | Property | Description |
 |----------|-------------|
 | `InternalKey` | Unique identifier for the business rule |
-| `InternalRule` | Human-readable description of the rule |
+| `InternalRequirement` | Human-readable requirement statement |
 | `InternalDescription` | Optional detailed description |
 | `InternalCategory` | Optional category for organizing rules |
 
@@ -78,14 +78,14 @@ Custom exception encapsulating a violated business rule with properties: `Busine
     {
       "className": "UserMustBeAdult",
       "key": "USER_AGE_MIN",
-      "rule": "User must be at least 18 years old",
+      "requirement": "User must be at least 18 years old",
       "description": "Users under 18 cannot create accounts due to legal requirements",
       "category": "UserValidation"
     },
     {
       "className": "PasswordMinLength",
       "key": "PWD_MIN_LENGTH",
-      "rule": "Password must contain at least 8 characters",
+      "requirement": "Password must contain at least 8 characters",
       "category": "Security"
     }
   ]
@@ -154,7 +154,7 @@ try
 }
 catch (BusinessRuleViolationException ex)
 {
-    Console.WriteLine($"Rule violated: {ex.Rule}");
+    Console.WriteLine($"Rule violated: {ex.Requirement}");
     // Output: User must be at least 18 years old
     Console.WriteLine($"Key: {ex.Key}");
     // Output: USER_AGE_MIN

@@ -64,7 +64,7 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
 
 For each rule in JSON:
 ```json
-{ "className": "UserMustBeAdult", "key": "USER_AGE_MIN", "rule": "...", "category": "UserValidation" }
+{ "className": "UserMustBeAdult", "key": "USER_AGE_MIN", "requirement": "...", "category": "UserValidation" }
 ```
 
 The generator produces:

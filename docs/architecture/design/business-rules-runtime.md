@@ -126,7 +126,7 @@ public class BusinessRuleViolationException : Exception
 {
     public BusinessRuleBase BusinessRule { get; }
     public string Key => BusinessRule.Key;
-    public string Rule => BusinessRule.Rule;
+    public string Requirement => BusinessRule.Requirement;
     public string Description => BusinessRule.Description;
     public string Category => BusinessRule.Category;
 }

@@ -10,6 +10,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace BusinessRulesAnalyzer;
 
+/// <summary>
+/// Analyzer (BR001): Reports an error when a business rule key used in an attribute
+/// is not defined in the project's BusinessRules.json file.
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
 {
@@ -27,8 +31,10 @@ public class BusinessRuleKeyExistsAnalyzer : DiagnosticAnalyzer
         customTags: []
     );
 
+    /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

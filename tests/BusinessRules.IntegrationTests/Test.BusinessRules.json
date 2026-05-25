@@ -4,63 +4,63 @@
     {
       "className": "UserMustBeAuthenticated",
       "key": "USER_AUTH",
-      "rule": "User must be authenticated",
+      "requirement": "User must be authenticated",
       "description": "Validates that the user is authenticated",
       "category": "Authentication"
     },
     {
       "className": "UserMustBeAdmin",
       "key": "USER_ADMIN",
-      "rule": "User must have admin privileges",
+      "requirement": "User must have admin privileges",
       "description": "Validates that the user has admin rights",
       "category": "Authorization"
     },
     {
       "className": "AgeMinimum",
       "key": "AGE_MIN",
-      "rule": "User must be at least 18 years old",
+      "requirement": "User must be at least 18 years old",
       "description": "Validates minimum age requirement",
       "category": "Validation"
     },
     {
       "className": "EmailVerified",
       "key": "EMAIL_VERIFIED",
-      "rule": "Email must be verified",
+      "requirement": "Email must be verified",
       "description": "",
       "category": ""
     },
     {
       "className": "TermsAccepted",
       "key": "TERMS_ACCEPTED",
-      "rule": "Terms must be accepted",
+      "requirement": "Terms must be accepted",
       "description": "",
       "category": ""
     },
     {
       "className": "SessionActive",
       "key": "SESSION_ACTIVE",
-      "rule": "Session must be active",
+      "requirement": "Session must be active",
       "description": "",
       "category": ""
     },
     {
       "className": "PaymentVerified",
       "key": "PAYMENT_VERIFIED",
-      "rule": "Payment must be verified",
+      "requirement": "Payment must be verified",
       "description": "",
       "category": ""
     },
     {
       "className": "DataEncrypted",
       "key": "DATA_ENCRYPTED",
-      "rule": "Data must be encrypted",
+      "requirement": "Data must be encrypted",
       "description": "",
       "category": ""
     },
     {
       "className": "InventoryAvailable",
       "key": "INVENTORY_AVAILABLE",
-      "rule": "Inventory must be available",
+      "requirement": "Inventory must be available",
       "description": "",
       "category": ""
     }

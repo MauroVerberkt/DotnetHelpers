@@ -70,24 +70,7 @@ public abstract class Option<TValue>
         };
     }
 
-    /// <summary>
-    /// Applies an asynchronous function to the value if present, otherwise applies an asynchronous function for when no value is
-    /// present.
-    /// </summary>
-    /// <param name="some">
-    /// The asynchronous function to apply if the option contains a value, accepting a
-    /// <see cref="CancellationToken" />.
-    /// </param>
-    /// <param name="none">
-    /// The asynchronous function to apply if the option does not contain a value, accepting a
-    /// <see cref="CancellationToken" />.
-    /// </param>
-    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-    /// <typeparam name="TResult">The result type of the match function.</typeparam>
-    /// <returns>A task representing the result of the appropriate function based on the option's value presence.</returns>
-    /// <exception cref="OptionNotPresentException">
-    /// Thrown if the option is in an invalid state and neither a <see cref="Some{TValue}" /> nor <see cref="None{TValue}" />.
-    /// </exception>
+    /// <inheritdoc cref="Option{TValue}.MatchAsync{TResult}(Func{TValue, Task{TResult}}, Func{Task{TResult}})"/>
     public async Task<TResult> MatchAsync<TResult>(
         Func<TValue, CancellationToken, Task<TResult>> some, Func<CancellationToken, Task<TResult>> none,
         CancellationToken cancellationToken)

@@ -133,7 +133,7 @@ public void CreateUserWithErrorHandling(string username, int age, string passwor
         var rule = faultEx.Detail.BusinessRule;
         Console.WriteLine($"Business rule violation:");
         Console.WriteLine($"  Key: {rule.Key}");
-        Console.WriteLine($"  Rule: {rule.Rule}");
+        Console.WriteLine($"  Requirement: {rule.Requirement}");
         Console.WriteLine($"  Description: {rule.Description}");
         Console.WriteLine($"  Category: {rule.Category}");
     }

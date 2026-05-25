@@ -198,7 +198,7 @@ public class UsersController : ControllerBase
             {
                 Error = result.Error.Message,
                 RuleKey = (result.Error as BusinessRuleViolationException)?.Key,
-                RuleDescription = (result.Error as BusinessRuleViolationException)?.Rule
+                RuleDescription = (result.Error as BusinessRuleViolationException)?.Requirement
             });
     }
 }

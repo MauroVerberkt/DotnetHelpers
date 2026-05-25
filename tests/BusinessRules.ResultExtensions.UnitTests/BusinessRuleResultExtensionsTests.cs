@@ -222,7 +222,7 @@ public class BusinessRuleResultExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(brException.Key, Is.EqualTo("TEST_USER_AGE_MIN"));
-            Assert.That(brException.Rule, Is.EqualTo("User must be at least 18 years old"));
+            Assert.That(brException.Requirement, Is.EqualTo("User must be at least 18 years old"));
         });
     }
 

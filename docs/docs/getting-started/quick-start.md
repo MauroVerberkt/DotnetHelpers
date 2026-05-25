@@ -50,7 +50,7 @@ Define rules in JSON, get strongly-typed classes at compile time:
     {
       "className": "UserMustBeAdult",
       "key": "USER_AGE_MIN",
-      "rule": "User must be at least 18 years old",
+      "requirement": "User must be at least 18 years old",
       "category": "UserValidation"
     }
   ]
