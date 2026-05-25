@@ -1,0 +1,10 @@
+{
+  "label": "Design",
+  "position": 2,
+  "collapsed": false,
+  "collapsible": true,
+  "link": {
+    "type": "generated-index",
+    "description": "Component-level design documentation with diagrams and patterns."
+  }
+}

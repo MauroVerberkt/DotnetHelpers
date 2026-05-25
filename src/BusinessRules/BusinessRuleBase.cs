@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace BusinessRules;
 
+/// <summary>
+/// Abstract base class for all business rules, providing key, requirement, description, and category.
+/// </summary>
 [DataContract]
 public abstract class BusinessRuleBase
 {
@@ -10,7 +13,7 @@ public abstract class BusinessRuleBase
     internal abstract string InternalKey { get; }
 
     [DataMember, Required]
-    internal abstract string InternalRule { get; }
+    internal abstract string InternalRequirement { get; }
 
     [DataMember]
     internal abstract string InternalDescription { get; }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -8,6 +7,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace BusinessRulesAnalyzer;
 
+/// <summary>
+/// Analyzer (BR004): Warns when a method throws a business rule exception
+/// without having the <c>[ImplementsBusinessRule]</c> attribute.
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ThrowWithoutValidationAnalyzer : DiagnosticAnalyzer
 {
@@ -24,8 +27,10 @@ public class ThrowWithoutValidationAnalyzer : DiagnosticAnalyzer
         "Methods that throw BusinessRule exceptions should have the [ImplementsBusinessRule] attribute to document what rule is being validated."
     );
 
+    /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
+    /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

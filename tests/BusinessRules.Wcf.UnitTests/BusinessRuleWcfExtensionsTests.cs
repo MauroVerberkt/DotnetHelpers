@@ -19,7 +19,7 @@ public class BusinessRuleWcfExtensionsTests
             Assert.That(faultException.Detail, Is.Not.Null);
             Assert.That(faultException.Detail.BusinessRule, Is.Not.Null);
             Assert.That(faultException.Detail.BusinessRule.InternalKey, Is.EqualTo("TEST_USER_AGE_MIN"));
-            Assert.That(faultException.Detail.BusinessRule.InternalRule, Is.EqualTo("User must be at least 18 years old"));
+            Assert.That(faultException.Detail.BusinessRule.InternalRequirement, Is.EqualTo("User must be at least 18 years old"));
             Assert.That(faultException.Reason.ToString(), Is.EqualTo("User must be at least 18 years old"));
             Assert.That(faultException.Code.Name, Is.EqualTo("TEST_USER_AGE_MIN"));
         });
@@ -35,7 +35,7 @@ public class BusinessRuleWcfExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(faultException.Detail.BusinessRule.InternalKey, Is.EqualTo("TEST_PWD_MIN_LENGTH"));
-            Assert.That(faultException.Detail.BusinessRule.InternalRule, Is.EqualTo("Password must contain at least 8 characters"));
+            Assert.That(faultException.Detail.BusinessRule.InternalRequirement, Is.EqualTo("Password must contain at least 8 characters"));
             Assert.That(faultException.Reason.ToString(), Is.EqualTo("Password must contain at least 8 characters"));
             Assert.That(faultException.Code.Name, Is.EqualTo("TEST_PWD_MIN_LENGTH"));
         });
@@ -85,7 +85,7 @@ public class BusinessRuleWcfExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(faultException.Detail.BusinessRule.InternalKey, Is.EqualTo("TEST_USER_AUTH"));
-            Assert.That(faultException.Detail.BusinessRule.InternalRule, Is.EqualTo("User must be authenticated"));
+            Assert.That(faultException.Detail.BusinessRule.InternalRequirement, Is.EqualTo("User must be authenticated"));
             Assert.That(faultException.Reason.ToString(), Is.EqualTo("User must be authenticated"));
             Assert.That(faultException.Code.Name, Is.EqualTo("TEST_USER_AUTH"));
         });
@@ -161,7 +161,7 @@ public class BusinessRuleWcfExtensionsTests
         var faultException = BusinessRuleWcfExtensions.ToFaultException<TestPasswordMinLength>();
 
         // Act
-        BusinessRuleFault? caughtFault = null;
+        BusinessRuleFault? caughtFault;
         try
         {
             throw faultException;
@@ -176,7 +176,7 @@ public class BusinessRuleWcfExtensionsTests
         {
             Assert.That(caughtFault, Is.Not.Null);
             Assert.That(caughtFault.BusinessRule.InternalKey, Is.EqualTo("TEST_PWD_MIN_LENGTH"));
-            Assert.That(caughtFault.BusinessRule.InternalRule, Is.EqualTo("Password must contain at least 8 characters"));
+            Assert.That(caughtFault.BusinessRule.InternalRequirement, Is.EqualTo("Password must contain at least 8 characters"));
         });
     }
 }

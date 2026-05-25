@@ -9,6 +9,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace BusinessRulesAnalyzer;
 
+/// <summary>
+/// Analyzer (BR002/BR003): Ensures every <c>[BusinessRule]</c> attribute has a corresponding
+/// <c>[ImplementsBusinessRule]</c> somewhere in the compilation.
+/// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class RequiresValidationAnalyzer : DiagnosticAnalyzer
 {
@@ -38,8 +42,10 @@ public class RequiresValidationAnalyzer : DiagnosticAnalyzer
         customTags: [WellKnownDiagnosticTags.CompilationEnd]
     );
 
+    /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [ErrorRule, WarningRule];
 
+    /// <inheritdoc />
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
