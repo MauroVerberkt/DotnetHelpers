@@ -8,21 +8,25 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Formatting;
-using Microsoft.CodeAnalysis.Simplification;
 
 namespace BusinessRulesFixProvider;
 
+/// <summary>
+/// Code fix provider for BR004: automatically adds an <c>[ImplementsBusinessRule]</c> attribute
+/// to methods that throw business rule exceptions without one.
+/// </summary>
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ThrowWithoutValidationCodeFixProvider)), Shared]
 public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
 {
     private const string Title = "Add [ImplementsBusinessRule] attribute";
 
+    /// <inheritdoc />
     public sealed override ImmutableArray<string> FixableDiagnosticIds => ["BR004"];
 
+    /// <inheritdoc />
     public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
+    /// <inheritdoc />
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
         var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);

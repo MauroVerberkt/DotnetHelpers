@@ -1,0 +1,10 @@
+{
+  "label": "Decisions (ADRs)",
+  "position": 1,
+  "collapsed": false,
+  "collapsible": true,
+  "link": {
+    "type": "generated-index",
+    "description": "Architecture Decision Records documenting key design choices."
+  }
+}

@@ -1,0 +1,27 @@
+/**
+ * DotnetHelpers Theme
+ * Based on .NET purple color scheme
+ */
+
+:root {
+  --ifm-color-primary: #512bd4;
+  --ifm-color-primary-dark: #4825bf;
+  --ifm-color-primary-darker: #4423b4;
+  --ifm-color-primary-darkest: #381d94;
+  --ifm-color-primary-light: #6341d9;
+  --ifm-color-primary-lighter: #6d4ddb;
+  --ifm-color-primary-lightest: #8a70e2;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(81, 43, 212, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #9b7ede;
+  --ifm-color-primary-dark: #8666d8;
+  --ifm-color-primary-darker: #7b59d5;
+  --ifm-color-primary-darkest: #5e35c7;
+  --ifm-color-primary-light: #b096e4;
+  --ifm-color-primary-lighter: #bba3e7;
+  --ifm-color-primary-lightest: #d5c9f0;
+  --docusaurus-highlighted-code-line-bg: rgba(155, 126, 222, 0.2);
+}

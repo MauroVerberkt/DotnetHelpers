@@ -1,0 +1,10 @@
+{
+  "label": "Business Rules",
+  "position": 3,
+  "collapsed": false,
+  "collapsible": true,
+  "link": {
+    "type": "generated-index",
+    "description": "Code generation-based framework for defining and enforcing business rules."
+  }
+}

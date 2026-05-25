@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace BusinessRules.Utilities;
 
-public static class BusinessRuleResolver
+internal static class BusinessRuleResolver
 {
-    public static BusinessRuleBase? FindBusinessRuleByKey(string key)
+    internal static BusinessRuleBase? FindBusinessRuleByKey(string key)
     {
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 

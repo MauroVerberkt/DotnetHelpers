@@ -17,42 +17,42 @@ public class IntegrationTests
             {
               "className": "UserMustBeAuthenticated",
               "key": "USER_AUTH",
-              "rule": "User must be authenticated",
+              "requirement": "User must be authenticated",
               "description": "User must provide valid authentication credentials",
               "category": "Authentication"
             },
             {
               "className": "UserMustBeAdmin",
               "key": "USER_ADMIN",
-              "rule": "User must be admin",
+              "requirement": "User must be admin",
               "description": "User must have admin role",
               "category": "Authorization"
             },
             {
               "className": "AgeMinimum",
               "key": "AGE_MIN",
-              "rule": "Age minimum",
+              "requirement": "Age minimum",
               "description": "User must meet minimum age requirement",
               "category": "Validation"
             },
             {
               "className": "EmailVerified",
               "key": "EMAIL_VERIFIED",
-              "rule": "Email verified",
+              "requirement": "Email verified",
               "description": "User email must be verified",
               "category": "Validation"
             },
             {
               "className": "TermsAccepted",
               "key": "TERMS_ACCEPTED",
-              "rule": "Terms accepted",
+              "requirement": "Terms accepted",
               "description": "User must accept terms of service",
               "category": "General"
             },
             {
               "className": "SessionActive",
               "key": "SESSION_ACTIVE",
-              "rule": "Session active",
+              "requirement": "Session active",
               "description": "User session must be active",
               "category": "General"
             }

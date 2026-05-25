@@ -17,10 +17,10 @@ public static class BusinessRuleWcfExtensions
     /// <returns>
     /// A <see cref="FaultException{BusinessRuleFault}"/> containing the business rule information.
     /// </returns>
-    /// <remarks>
-    /// This method creates a new instance of the business rule and wraps it in a WCF fault exception.
-    /// The fault reason is set to the rule's message, and the fault code is set to the rule's key.
-    /// </remarks>
+/// <remarks>
+/// This method creates a new instance of the business rule and wraps it in a WCF fault exception.
+/// The fault reason is set to the rule's requirement text, and the fault code is set to the rule's key.
+/// </remarks>
     [Pure]
     public static FaultException<BusinessRuleFault> ToFaultException<T>()
         where T : BusinessRule<T>, new()
@@ -28,7 +28,7 @@ public static class BusinessRuleWcfExtensions
         var instance = new T();
         return new FaultException<BusinessRuleFault>(
             new BusinessRuleFault(instance),
-            new FaultReason(instance.InternalRule),
+            new FaultReason(instance.InternalRequirement),
             new FaultCode(instance.InternalKey));
     }
 
@@ -41,7 +41,7 @@ public static class BusinessRuleWcfExtensions
     /// A <see cref="FaultException{BusinessRuleFault}"/> containing the business rule information.
     /// </returns>
     /// <remarks>
-    /// The fault reason is set to the rule's message, and the fault code is set to the rule's key.
+    /// The fault reason is set to the rule's requirement text, and the fault code is set to the rule's key.
     /// </remarks>
     [Pure]
     public static FaultException<BusinessRuleFault> ToFaultException(this BusinessRuleBase businessRule)
@@ -50,7 +50,7 @@ public static class BusinessRuleWcfExtensions
 
         return new FaultException<BusinessRuleFault>(
             new BusinessRuleFault(businessRule),
-            new FaultReason(businessRule.InternalRule),
+            new FaultReason(businessRule.InternalRequirement),
             new FaultCode(businessRule.InternalKey));
     }
 

@@ -1,0 +1,15 @@
+HelperMonads:
+  label: HelperMonads
+  description: Relates to the HelperMonads library (Result, Option)
+
+BusinessRules:
+  label: BusinessRules
+  description: Relates to the BusinessRules framework (rules, generators, analyzers)
+
+NewProject:
+  label: NewProject
+  description: Proposal for an entirely new project or package
+
+SourceGenerators:
+  label: SourceGenerators
+  description: Relates to Roslyn source generators
