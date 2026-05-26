@@ -45,3 +45,18 @@ jobs:
     needs: changes
     if: always() && (needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || github.event_name == 'push')
     uses: ./.github/workflows/_docs-validate.yml
+
+  # Gate job: the single required status check for branch protection.
+  # Always runs, aggregates results from conditional jobs.
+  ci-gate:
+    if: always()
+    needs: [build-and-test, docs-validate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.build-and-test.result }}" == "failure" || "${{ needs.docs-validate.result }}" == "failure" ]]; then
+            echo "CI failed"
+            exit 1
+          fi
+          echo "CI passed (build-and-test: ${{ needs.build-and-test.result }}, docs-validate: ${{ needs.docs-validate.result }})"
