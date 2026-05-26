@@ -6,7 +6,7 @@ tags: [infra, testing]
 
 # PROP-009: CI Pipeline & Live Test Reporting
 
-**Status:** idea  
+**Status:** exploring  
 **Size:** medium  
 **Created:** 2025-05-25  
 
@@ -94,20 +94,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
       - run: dotnet build
       - run: dotnet test --collect:"XPlat Code Coverage"
       - # upload coverage to chosen provider
       - # generate and deploy report
 ```
 
+## Decisions
+
+- **Public repo** — going public, so free-for-OSS tiers of Codecov/SonarCloud are available.
+- **Coverage threshold** — no hard gate initially. Measure baseline first, then ratchet. Want the ability to switch between coverage metrics (line, branch, method) in the reporting UI.
+- **Independent from PROP-008** — CI is higher priority and has no dependency on docs hosting.
+- **Static analysis (SonarCloud)** — not in MVP, but a strong candidate for phase 2. Provides reviewer-like feedback (code smells, complexity, security hotspots) which is valuable given no human reviewers. Layer in after the base pipeline is working.
+- **Multi-TFM** — deferred to PROP-010. For now, test on net8.0 only.
+- **Analyzer/generator coverage** — yes, include these in CI. They're the most likely to break silently since they run at compile-time in consumers' builds.
+
 ## Open Questions
 
-- Is the repo going public, or do we need solutions that work for private repos too?
-- Minimum coverage threshold to enforce (e.g., 80%)?
-- Should this block on PROP-008 (docs hosting), or are they independent deployments?
-- Do we want full static analysis (SonarCloud) or just coverage?
-- Test across multiple TFMs, or just net8.0?
-- Should the Roslyn analyzer/generator projects have integration test coverage too?
+- Coverlet output format: Cobertura (Codecov-friendly) vs OpenCover (ReportGenerator-friendly) vs both?
+- Branch protection rules: require passing tests on PRs from the start, or add later?
 
 ## Prior Art / References
 
