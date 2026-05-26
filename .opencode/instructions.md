@@ -63,13 +63,13 @@ DotnetHelpers/
 
 ## Proposals
 
-- **Location:** `docs/architecture/proposals/`
-- **Template:** `_TEMPLATE.md` (always use this as starting point)
+- **Location:** `docs/architecture/proposals/active/` (active) and `docs/architecture/proposals/completed/` (done/parked)
+- **Template:** `docs/architecture/proposals/_TEMPLATE.md` (always use this as starting point)
 - **Naming:** `NNN-kebab-title.md` (zero-padded to 3 digits)
 - **Lifecycle:** idea → exploring → ready → building → done | parked
 - **Size:** small | medium | large | new-project
-- **Completion:** When done/parked, fill the Outcome section and link to
-  resulting ADR(s) if applicable.
+- **Completion:** When done/parked, fill the Outcome section, move to
+  `completed/`, and link to resulting ADR(s) if applicable.
 
 Proposals are the thinking-out-loud space. They can be messy, incomplete, and
 revised freely until they reach "done" status.
