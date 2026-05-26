@@ -6,7 +6,7 @@ tags: [infra, testing]
 
 # PROP-009: CI Pipeline & Live Test Reporting
 
-**Status:** exploring  
+**Status:** ready  
 **Size:** medium  
 **Created:** 2025-05-25  
 
@@ -26,34 +26,36 @@ This proposal is broader than just reporting — it encompasses the full pipelin
 ### Pipeline Scope
 
 ```
-push/PR → build → run tests → collect coverage → publish report → update badges
+PR → build → run tests → collect coverage → publish report → update badges
+push to main (post-merge) → same + deploy artifacts + update badges on default branch
 ```
 
-### Components to Investigate
+### Chosen Components
 
-1. **CI Provider** — GitHub Actions (already on GitHub, free for public repos)
+1. **CI Provider** — GitHub Actions (free for public repos)
 2. **Test Execution** — `dotnet test` across all test projects
-3. **Coverage Collection** — Coverlet (already standard in .NET), output as Cobertura XML or OpenCover
-4. **Report Generation** — ReportGenerator, or a hosted service that consumes raw coverage data
-5. **Hosted Report Dashboard** — Where the live report lives publicly
+3. **Coverage Collection** — Coverlet, output both Cobertura (for Codecov) and OpenCover (for ReportGenerator if ever needed). No cost to producing both.
+4. **Coverage Reporting** — Codecov (MVP). May run parallel with self-hosted dashboard later (PROP-008 stretch goal); they serve different purposes (Codecov for PR diff feedback, self-hosted for unified portal).
+5. **Artifact Storage** — `test-summary.json` published to `gh-pages` branch (persistent, accessible to Docusaurus build, no expiry unlike Actions artifacts)
 
-### Hosting Options for Reports
+### CI Job Structure
 
-| Option | Pros | Cons |
-|--------|------|------|
-| **Codecov** | Free for OSS, PR comments with diff coverage, historical trends | Third-party dependency |
-| **Coveralls** | Free for OSS, badge support, GitHub integration | Less active development |
-| **GitHub Pages (self-hosted)** | Full control, ReportGenerator HTML output | More setup, no trend tracking OOTB |
-| **SonarCloud** | Free for OSS, code quality + coverage + security, very comprehensive | Heavier setup, opinionated |
-| **Allure Report** | Beautiful test reports, history tracking, hosted via GitHub Pages | Primarily test results, coverage is secondary |
+Two logical jobs, triggered by path filters:
 
-### Nice-to-Haves
+| Trigger | Jobs that run |
+|---------|--------------|
+| PR with code changes | `build-and-test` + `docs-validate` |
+| PR with docs only | `docs-validate` only |
+| Push to main (post-merge) | `build-and-test` + `docs-validate` + badge/artifact updates |
+
+Code PRs always validate docs too, since code changes can affect API docs or generated content.
+
+### Nice-to-Haves (Post-MVP)
 
 - **Test result reporting** (not just coverage) — which tests passed/failed, duration trends
 - **PR annotations** — inline coverage gaps on changed files
 - **Coverage badges** — embed in README and docs site
-- **Matrix builds** — test across multiple .NET versions if packages support netstandard2.0+
-- **Branch protection** — require passing tests + minimum coverage on PRs
+- **SonarCloud** — phase 2, layered on top of base pipeline
 
 ### Stretch Goal: Live Developer Portal
 
@@ -87,9 +89,14 @@ This doubles as a portfolio piece — linking employers to a live dashboard show
 
 ```yaml
 # .github/workflows/ci.yml
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches: [main]  # post-merge runs for badge/artifact updates
+
 jobs:
   build-and-test:
+    if: # path filter — skip when only docs/** changed (on PRs)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -100,8 +107,16 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
       - run: dotnet build
       - run: dotnet test --collect:"XPlat Code Coverage"
-      - # upload coverage to chosen provider
-      - # generate and deploy report
+      - # upload coverage to Codecov
+      - # generate test-summary.json
+      - # publish test-summary.json to gh-pages branch
+
+  docs-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - # npm ci && npm run build (validate docs build)
+      - # deploy step placeholder (owned by PROP-008)
 ```
 
 ## Decisions
@@ -112,11 +127,18 @@ jobs:
 - **Static analysis (SonarCloud)** — not in MVP, but a strong candidate for phase 2. Provides reviewer-like feedback (code smells, complexity, security hotspots) which is valuable given no human reviewers. Layer in after the base pipeline is working.
 - **Multi-TFM** — deferred to PROP-010. For now, test on net8.0 only.
 - **Analyzer/generator coverage** — yes, include these in CI. They're the most likely to break silently since they run at compile-time in consumers' builds.
+- **Machine-readable output** — CI publishes a `test-summary.json` artifact (coverage %, test count, pass/fail, timestamp) to the `gh-pages` branch alongside the Codecov upload. Persistent, no expiry, and directly consumable by the Docusaurus build (PROP-008 stretch goal).
+- **Branch protection** — require PRs for all changes to main, no exceptions. CI uses path filters to determine which jobs run: docs-only PRs skip build/test and only run docs validation. No direct-push bypass for docs.
+- **Code PRs validate docs too** — since code changes can affect API docs or generated content, the `docs-validate` job runs on all PRs regardless of path.
+- **Trigger model** — CI runs on both `pull_request` (for gating) and `push` to main (post-merge, for badge updates and artifact publishing on the default branch).
+- **Docs deploy** — CI validates the docs build (catches broken MDX/links). Actual deployment is PROP-008's responsibility; placeholder step in workflow for now.
+- **Codecov is long-term** — even if a self-hosted dashboard (PROP-008 stretch) is built later, Codecov stays for PR diff coverage feedback. They serve different purposes.
+
+- **Coverlet output format** — both Cobertura and OpenCover. Cobertura goes to Codecov, OpenCover is available for ReportGenerator if self-hosted reports are ever needed. No cost to producing both.
 
 ## Open Questions
 
-- Coverlet output format: Cobertura (Codecov-friendly) vs OpenCover (ReportGenerator-friendly) vs both?
-- Branch protection rules: require passing tests on PRs from the start, or add later?
+_None remaining — ready to build._
 
 ## Prior Art / References
 

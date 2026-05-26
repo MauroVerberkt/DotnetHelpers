@@ -9,6 +9,7 @@ tags: [docs]
 **Status:** idea  
 **Size:** small  
 **Created:** 2025-05-25  
+**Blocked by:** PROP-009 (CI pipeline must exist before docs deploy can hook into it)
 
 ## Problem / Motivation
 
@@ -55,6 +56,42 @@ PR opened → CI builds Docusaurus → deploy preview (optional)
 - Is a custom domain planned, or is `*.github.io` / `*.vercel.app` acceptable?
 - Should the docs site be in the same repo (monorepo) or split out?
 - Any preference for a provider that aligns with the .NET ecosystem (e.g., Azure)?
+
+## Stretch Goal: Integrated Project Health Dashboard
+
+Once PROP-009 (CI pipeline) is producing test/coverage data, the docs site can surface that data directly rather than just linking to external tools.
+
+### Option A: Embedded Health Component
+
+A custom React component within the existing Docusaurus site that displays a summary of project health:
+
+- Coverage %, trend sparkline, test count, last green build
+- Rendered on the docs landing page or a dedicated "Project Health" page
+- "View full report →" link to Codecov/SonarCloud for drill-down
+
+**Data flow:**
+```
+CI run → publishes test-summary.json artifact
+Docusaurus build → fetches artifact at build time (no CORS, no client-side fetch)
+CI triggers docs redeploy after test data updates → always in sync
+```
+
+This keeps the docs site as the single entry point while leveraging external tools for the heavy lifting. Low effort, high portfolio value.
+
+### Option B: Full Dashboard Page
+
+A dedicated `/dashboard` route in Docusaurus with multiple panels:
+
+- Coverage breakdown per project
+- Benchmark history (BenchmarkDotNet trend charts)
+- Build health (duration, flaky test detection)
+- Branch comparison
+
+Essentially a lightweight Grafana alternative built as Docusaurus pages. More impressive as a portfolio piece but significantly more work — likely a project in itself.
+
+### Shared Dependency
+
+Both options require PROP-009 to publish a machine-readable summary artifact (e.g., `test-summary.json`) as part of CI output. That's PROP-009's interface contract to this stretch goal.
 
 ## Prior Art / References
 
