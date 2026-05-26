@@ -1,3 +1,6 @@
+[![CI](https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml/badge.svg)](https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/MauroVerberkt/DotnetHelpers/graph/badge.svg)](https://app.codecov.io/github/MauroVerberkt/DotnetHelpers)
+
 # DotnetHelpers
 
 Functional patterns for .NET: **Result**, **Option**, and **Business Rules**.
@@ -45,3 +48,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 - .NET 8.0+
 - C# 12+
+
+## CI & Quality
+
+All changes go through pull requests with automated CI. Tests and coverage run on every PR via GitHub Actions. Coverage is tracked on [Codecov](https://app.codecov.io/github/MauroVerberkt/DotnetHelpers) with both line and branch metrics.
