@@ -1,5 +1,3 @@
-using BusinessRules;
-
 namespace BusinessRules.ResultExtensions.UnitTests;
 
 // Test business rules for unit testing

@@ -13,3 +13,15 @@ NewProject:
 SourceGenerators:
   label: SourceGenerators
   description: Relates to Roslyn source generators
+
+docs:
+  label: Docs
+  description: Relates to documentation, Docusaurus site, and hosting
+
+infra:
+  label: Infra
+  description: Relates to infrastructure, CI/CD pipelines, and DevOps
+
+testing:
+  label: Testing
+  description: Relates to testing strategies, test reporting, and coverage

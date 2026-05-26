@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  # Determine which paths changed to conditionally skip jobs
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'src/**'
+              - 'tests/**'
+              - '*.sln'
+              - '*.slnf'
+              - 'Directory.Build.props'
+              - 'tools/**'
+              - '.github/workflows/**'
+            docs:
+              - 'docs/**'
+
+  build-and-test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'push'
+    uses: ./.github/workflows/_build-and-test.yml
+    with:
+      publish-summary: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  docs-validate:
+    needs: changes
+    if: always() && (needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || github.event_name == 'push')
+    uses: ./.github/workflows/_docs-validate.yml
