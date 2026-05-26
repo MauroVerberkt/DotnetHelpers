@@ -6,7 +6,7 @@ tags: [infra, testing]
 
 # PROP-009: CI Pipeline & Live Test Reporting
 
-**Status:** ready  
+**Status:** done  
 **Size:** medium  
 **Created:** 2025-05-25  
 
@@ -151,4 +151,17 @@ _None remaining — ready to build._
 
 ## Outcome
 
-_Filled when status changes to done/parked. Link to ADR(s) if applicable._
+Implemented 2025-05-26. Core MVP delivered:
+
+- `.github/workflows/ci.yml` — orchestrator with path filtering via `dorny/paths-filter`
+- `.github/workflows/_build-and-test.yml` — reusable workflow: restore → build → test → Coverlet (cobertura+opencover) → Codecov coverage + test results upload → test-summary.json artifact
+- `.github/workflows/_docs-validate.yml` — reusable workflow: npm ci → Docusaurus build validation
+- `.github/ruleset-protect-main.json` — branch protection ruleset (PRs required, status checks enforced)
+- `tests/Directory.Build.props` — JunitXml.TestLogger for all test projects
+- Dead local NuGet source removed from `nuget.config`
+
+**Stretch goals remaining** (spawn new proposals when pursued):
+- SonarCloud integration (phase 2 static analysis)
+- PR annotations for coverage gaps
+- Coverage badges in README/docs
+- Live Developer Portal (benchmarks, dashboards, branch comparison)
