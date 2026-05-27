@@ -45,7 +45,7 @@ jobs:
           dotnet test --no-build --configuration Release \
             --collect:"XPlat Code Coverage" \
             --results-directory ./test-results \
-            --logger "junit;LogFilePath=junit-{assembly}.xml" \
+            --logger "junit;LogFilePath=${{ github.workspace }}/test-results/junit-{assembly}.xml" \
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
 
       - name: Upload coverage to Codecov
@@ -61,7 +61,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           directory: ./test-results
-          files: "**/junit-*.xml"
+          files: junit-*.xml
           report_type: test_results
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
