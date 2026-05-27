@@ -6,10 +6,10 @@ tags: [docs]
 
 # PROP-008: Docusaurus Hosting
 
-**Status:** idea  
+**Status:** ready  
 **Size:** small  
 **Created:** 2025-05-25  
-**Blocked by:** PROP-009 (CI pipeline must exist before docs deploy can hook into it)
+**Updated:** 2026-05-27
 
 ## Problem / Motivation
 
@@ -24,38 +24,79 @@ Key considerations:
 
 ## Sketch
 
-### Hosting Options to Investigate
+### Decision: GitHub Pages
 
-1. **GitHub Pages** — Free, native GitHub Actions integration, custom domain support. Docusaurus has first-class support via `docusaurus deploy`.
-2. **Vercel** — Free tier for personal projects, automatic preview deployments on PRs, excellent performance.
-3. **Netlify** — Free tier, PR previews, form handling if ever needed, redirect rules.
-4. **Cloudflare Pages** — Free tier, global CDN, fast builds, custom domains with Cloudflare DNS.
-5. **Azure Static Web Apps** — Free tier, GitHub Actions integration, suits the .NET ecosystem branding.
+GitHub Pages is the clear winner for this project:
 
-### Evaluation Criteria
+- **Zero cost**, zero new vendor accounts — everything stays in GitHub (code, packages, CI, docs)
+- **First-class Docusaurus support** — official deployment guide, works with `actions/deploy-pages`
+- **HTTPS out of the box** on `*.github.io`
+- **Minimal maintenance** — static files served from a CDN, no infrastructure to manage
 
-| Criterion | Weight |
-|-----------|--------|
-| Cost (free tier) | High |
-| CI/CD integration | High |
-| Custom domain + HTTPS | High |
-| PR preview deployments | Medium |
-| Build speed | Low |
-| Vendor lock-in | Low |
+PR preview deployments are sacrificed, but `npm start` locally is sufficient for a single-maintainer project. If needed later, switching to Vercel/Netlify is trivial (static site, no lock-in).
 
-### Deployment Workflow (Generic)
+### Deployment Workflow
 
+```yaml
+# .github/workflows/deploy-docs.yml
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+      - run: npm ci
+        working-directory: docs
+      - run: npm run build
+        working-directory: docs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build
+      - id: deployment
+        uses: actions/deploy-pages@v4
 ```
-push to main → CI builds Docusaurus → deploy to hosting provider
-PR opened → CI builds Docusaurus → deploy preview (optional)
+
+### Docusaurus Configuration
+
+Set `url` and `baseUrl` in `docusaurus.config.js`:
+
+```js
+url: 'https://mauroverberkt.github.io',
+baseUrl: '/DotnetHelpers/',
 ```
+
+### Repo Settings Required
+
+- Settings → Pages → Source: "GitHub Actions" (not "Deploy from a branch")
+
+### Post-Deploy Tasks
+
+- Update root `README.md` docs link from "run locally" instructions to the hosted URL (`https://mauroverberkt.github.io/DotnetHelpers/`)
+- Investigate build-time coverage injection: CI test run → extract percentage → inject into Docusaurus build as a custom field (enables live coverage display on landing page without client-side API calls)
 
 ## Open Questions
 
-- Do we want PR preview deployments, or is local preview sufficient?
-- Is a custom domain planned, or is `*.github.io` / `*.vercel.app` acceptable?
-- Should the docs site be in the same repo (monorepo) or split out?
-- Any preference for a provider that aligns with the .NET ecosystem (e.g., Azure)?
+- ~~Do we want PR preview deployments, or is local preview sufficient?~~ **Local preview is sufficient.** Single maintainer, `npm start` works fine.
+- ~~Is a custom domain planned, or is `*.github.io` / `*.vercel.app` acceptable?~~ **`*.github.io` is acceptable.** Custom domain can be added later without changing the workflow.
+- ~~Should the docs site be in the same repo (monorepo) or split out?~~ **Same repo.** Docs live next to the code they document — easier to keep in sync.
+- ~~Any preference for a provider that aligns with the .NET ecosystem (e.g., Azure)?~~ **No.** GitHub Pages aligns with everything else in the repo (GitHub Packages, GitHub Actions). Azure adds a vendor for no benefit.
 
 ## Stretch Goal: Integrated Project Health Dashboard
 

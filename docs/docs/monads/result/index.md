@@ -10,6 +10,8 @@ keywords:
   - railway oriented programming
   - map
   - bind
+  - cancellation token
+  - pattern matching
 ---
 
 import ResultDemo from '@site/src/components/ResultDemo';
@@ -45,15 +47,17 @@ The `Result<TData>` class provides:
 | `Data` | The data from a successful operation |
 | `Error` | The exception from a failed operation |
 | `Map` | Transforms data if successful |
-| `MapAsync` | Async version of `Map` |
-| `Bind` | Chains with another operation |
-| `BindAsync` | Async version of `Bind` |
-| `BindAndTransform` | Chains and transforms, passing `Data` to the function |
-| `BindAndTransformAsync` | Async version of `BindAndTransform` |
+| `MapAsync` | Async version of `Map` (with `CancellationToken` overload) |
+| `Bind` | Chains with another operation (doesn't pass data) |
+| `BindAsync` | Async version of `Bind` (with `CancellationToken` overload) |
+| `BindWithData` | Chains with another operation, passing current data (same return type) |
+| `BindWithDataAsync` | Async version of `BindWithData` (with `CancellationToken` overload) |
+| `BindAndTransform` | Chains and transforms, passing `Data` to the function (different return type) |
+| `BindAndTransformAsync` | Async version of `BindAndTransform` (with `CancellationToken` overload) |
 | `OnSuccess` | Executes an action if successful |
 | `OnFailure` | Executes an action if failed |
 | `Tap` | Executes an action regardless of outcome (useful for logging) |
-| `Deconstruct` | Deconstructs into `(IsSuccess, Data, Error)` |
+| `Deconstruct` | Deconstructs into `(IsSuccess, Data, Error)` for pattern matching |
 
 ## Basic Usage
 
@@ -138,6 +142,79 @@ public Result<UserDto> GetUserProfile(int userId)
         .OnFailure(error => _logger.LogWarning(error, "User {Id} not found", userId));
 }
 ```
+
+## Tap — Side Effects Regardless of Outcome
+
+`Tap` executes an action on the result regardless of success or failure, then returns the result unchanged. Useful for logging, metrics, or tracing in the middle of a pipeline:
+
+```csharp title="TapExample.cs"
+public Result<Order> ProcessOrder(OrderRequest request)
+{
+    return ValidateOrder(request)
+        .Tap(r => _logger.LogInformation("Validation result: {Success}", r.IsSuccess))
+        .BindWithData(order => SaveOrder(order))
+        .Tap(r => _metrics.RecordOrderAttempt(r.IsSuccess));
+}
+```
+
+## Deconstruct — Pattern Matching
+
+`Deconstruct` enables C# deconstruction syntax, letting you extract all components in a single assignment:
+
+```csharp title="DeconstructExample.cs"
+var (success, data, error) = GetUser(userId);
+
+if (success)
+{
+    Console.WriteLine($"Found user: {data!.Name}");
+}
+else
+{
+    Console.WriteLine($"Failed: {error!.Message}");
+}
+```
+
+## BindWithData — Chaining with Access to Current Data
+
+`BindWithData` is like `Bind`, but passes the current `Data` to the next operation. Use it when the next operation needs the current value and returns the **same type**:
+
+```csharp title="BindWithDataExample.cs"
+public Result<Order> FulfillOrder(int orderId)
+{
+    return GetOrder(orderId)
+        .BindWithData(order => ValidateInventory(order))   // receives Order, returns Result<Order>
+        .BindWithData(order => ApplyDiscount(order))       // same — still Result<Order>
+        .BindWithData(order => ChargePayment(order));      // same type throughout
+}
+
+// Compare with Bind (no data passed — for independent operations):
+// .Bind(() => NotifyWarehouse())    // doesn't need the order data
+
+// Compare with BindAndTransform (data passed — for type changes):
+// .BindAndTransform(order => CreateShipment(order))  // Order → Result<Shipment>
+```
+
+## CancellationToken Support
+
+All async operations have overloads that accept a `CancellationToken`, enabling proper cancellation propagation through result chains:
+
+```csharp title="CancellationTokenExample.cs"
+public async Task<Result<OrderConfirmation>> ProcessOrderAsync(
+    OrderRequest request, CancellationToken ct)
+{
+    return await ValidateOrderAsync(request, ct)
+        .BindWithDataAsync(
+            async (order, token) => await SaveOrderAsync(order, token), ct)
+        .BindAndTransformAsync(
+            async (order, token) => await ConfirmOrderAsync(order, token), ct);
+}
+```
+
+Available `CancellationToken` overloads:
+- `MapAsync(Func<TData, CancellationToken, Task<TNewData>>, CancellationToken)`
+- `BindAsync(Func<CancellationToken, Task<Result<TData>>>, CancellationToken)`
+- `BindWithDataAsync(Func<TData, CancellationToken, Task<Result<TData>>>, CancellationToken)`
+- `BindAndTransformAsync(Func<TData, CancellationToken, Task<Result<TNewData>>>, CancellationToken)`
 
 :::info
 
