@@ -89,6 +89,7 @@ baseUrl: '/DotnetHelpers/',
 ### Post-Deploy Tasks
 
 - Update root `README.md` docs link from "run locally" instructions to the hosted URL (`https://mauroverberkt.github.io/DotnetHelpers/`)
+- Investigate build-time coverage injection: CI test run → extract percentage → inject into Docusaurus build as a custom field (enables live coverage display on landing page without client-side API calls)
 
 ## Open Questions
 

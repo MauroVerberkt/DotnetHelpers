@@ -1,146 +1,210 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
+import {useState, type ReactNode} from 'react';
 import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
 
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+function BeforeCode() {
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
+    <pre className={styles.syntaxBlock}><code>
+<span className={styles.synKeyword}>try</span>{'\n'}
+<span className={styles.synPunct}>{'{'}</span>{'\n'}
+{'    '}<span className={styles.synKeyword}>var</span> <span className={styles.synVar}>user</span> <span className={styles.synPunct}>=</span> <span className={styles.synKeyword}>await</span> <span className={styles.synVar}>repository</span><span className={styles.synPunct}>.</span><span className={styles.synMethod}>GetById</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>id</span><span className={styles.synPunct}>);</span>{'\n'}
+{'\n'}
+{'    '}<span className={styles.synKeyword}>if</span> <span className={styles.synPunct}>(</span><span className={styles.synVar}>user</span> <span className={styles.synKeyword}>is</span> <span className={styles.synKeyword}>null</span><span className={styles.synPunct}>)</span>{'\n'}
+{'        '}<span className={styles.synKeyword}>throw new</span> <span className={styles.synType}>UserNotFoundException</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>id</span><span className={styles.synPunct}>);</span>{'\n'}
+{'\n'}
+{'    '}<span className={styles.synKeyword}>var</span> <span className={styles.synVar}>order</span> <span className={styles.synPunct}>=</span> <span className={styles.synKeyword}>await</span> <span className={styles.synVar}>orderService</span><span className={styles.synPunct}>.</span><span className={styles.synMethod}>Create</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>user</span><span className={styles.synPunct}>);</span>{'\n'}
+{'\n'}
+{'    '}<span className={styles.synKeyword}>await</span> <span className={styles.synVar}>paymentService</span><span className={styles.synPunct}>.</span><span className={styles.synMethod}>Process</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>order</span><span className={styles.synPunct}>);</span>{'\n'}
+{'\n'}
+{'    '}<span className={styles.synKeyword}>return</span> <span className={styles.synVar}>order</span><span className={styles.synPunct}>;</span>{'\n'}
+<span className={styles.synPunct}>{'}'}</span>{'\n'}
+<span className={styles.synKeyword}>catch</span> <span className={styles.synPunct}>(</span><span className={styles.synType}>ValidationException</span> <span className={styles.synVar}>ex</span><span className={styles.synPunct}>)</span>{'\n'}
+<span className={styles.synPunct}>{'{'}</span>{'\n'}
+{'    '}<span className={styles.synVar}>logger</span><span className={styles.synPunct}>.</span><span className={styles.synMethod}>LogWarning</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>ex</span><span className={styles.synPunct}>);</span>{'\n'}
+{'    '}<span className={styles.synKeyword}>throw</span><span className={styles.synPunct}>;</span>{'\n'}
+<span className={styles.synPunct}>{'}'}</span>{'\n'}
+<span className={styles.synKeyword}>catch</span> <span className={styles.synPunct}>(</span><span className={styles.synType}>PaymentException</span> <span className={styles.synVar}>ex</span><span className={styles.synPunct}>)</span>{'\n'}
+<span className={styles.synPunct}>{'{'}</span>{'\n'}
+{'    '}<span className={styles.synVar}>logger</span><span className={styles.synPunct}>.</span><span className={styles.synMethod}>LogError</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>ex</span><span className={styles.synPunct}>);</span>{'\n'}
+{'    '}<span className={styles.synKeyword}>throw</span><span className={styles.synPunct}>;</span>{'\n'}
+<span className={styles.synPunct}>{'}'}</span>
+    </code></pre>
+  );
+}
+
+function AfterCode() {
+  return (
+    <pre className={styles.syntaxBlock}><code>
+<span className={styles.synKeyword}>return await</span> <span className={styles.synMethod}>GetUser</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>id</span><span className={styles.synPunct}>)</span>{'\n'}
+{'    '}<span className={styles.synPunct}>.</span><span className={styles.synMethod}>BindAndTransformAsync</span><span className={styles.synPunct}>(</span>{'\n'}
+{'        '}<span className={styles.synVar}>u</span> <span className={styles.synPunct}>=&gt;</span> <span className={styles.synMethod}>CreateOrder</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>u</span><span className={styles.synPunct}>))</span>{'\n'}
+{'    '}<span className={styles.synPunct}>.</span><span className={styles.synMethod}>BindAndTransformAsync</span><span className={styles.synPunct}>(</span>{'\n'}
+{'        '}<span className={styles.synVar}>o</span> <span className={styles.synPunct}>=&gt;</span> <span className={styles.synMethod}>ProcessPayment</span><span className={styles.synPunct}>(</span><span className={styles.synVar}>o</span><span className={styles.synPunct}>));</span>{'\n\n\n\n\n'}
+    </code></pre>
+  );
+}
+
+function Hero() {
+  return (
+    <section className={styles.hero}>
+      <span className={styles.heroLabel}>.NET LIBRARY COLLECTION</span>
+      <Heading as="h1" className={styles.heroTitle}>
+        <span>Result types.</span>
+        <span>Source-generated rules.</span>
+        <span className={styles.heroTitleMuted}>No reflection.</span>
+      </Heading>
+      <p className={styles.heroSubtitle}>
+        Production-grade building blocks for .NET that make the type system work for you.
+      </p>
+      <div className={styles.heroCta}>
+        <Link className={styles.ctaPrimary} to="/docs/getting-started/installation">
+          Explore Docs
+        </Link>
+        <span className={styles.ctaSecondary}>
+          or view on{' '}
+          <Link href="https://github.com/MauroVerberkt/DotnetHelpers">GitHub</Link>
+        </span>
+      </div>
+    </section>
+  );
+}
+
+function CodeArtifact() {
+  const [showAfter, setShowAfter] = useState(false);
+
+  return (
+    <section className={styles.artifact}>
+      <div className={styles.artifactCode}>
+        <div className={styles.codeWindow}>
+          <div className={styles.windowDots}>
+            <span /><span /><span />
+          </div>
+          <span className={styles.windowTitle}>OrderService.cs</span>
+          <button
+            className={styles.codeToggle}
+            onClick={() => setShowAfter(!showAfter)}
+            type="button"
+          >
+            {showAfter ? '← See the problem' : 'Fix it →'}
+          </button>
+        </div>
+        <div className={styles.codeContent}>
+          <div className={styles.codeInner}>
+            <span className={showAfter ? styles.codeCommentGreen : styles.codeComment}>
+              {showAfter
+                ? '// Explicit, composable, type-safe'
+                : '// Hidden control flow, scattered try/catch'}
+            </span>
+            {showAfter ? <AfterCode /> : <BeforeCode />}
+          </div>
+        </div>
+      </div>
+      <aside className={styles.artifactAdr}>
+        <span className={styles.adrLabel}>ADR-001</span>
+        <Heading as="h3" className={styles.adrTitle}>
+          Result Pattern Over Exceptions
         </Heading>
-        <p className="hero__subtitle">
-          Production-grade building blocks for .NET — explicit error handling,
-          compile-time validated business rules, and null-safe optionals.
+        <span className={styles.adrStatus}>Accepted</span>
+        <p className={styles.adrExcerpt}>
+          In traditional C# code, errors are communicated through exceptions.
+          When used for expected failures, they become control flow — hidden from
+          method signatures and impossible to compose.
         </p>
-        <div className={styles.badges}>
-          <a href="https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml">
-            <img src="https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml/badge.svg" alt="CI" />
-          </a>
-          {' '}
-          <a href="https://app.codecov.io/github/MauroVerberkt/DotnetHelpers">
-            <img src="https://codecov.io/github/MauroVerberkt/DotnetHelpers/graph/badge.svg" alt="codecov" />
-          </a>
-          {' '}
-          <img src="https://img.shields.io/badge/.NET-8.0+-purple.svg" alt=".NET 8.0+" />
-          {' '}
-          <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" />
-        </div>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/getting-started/installation">
-            Explore the Docs
-          </Link>
-          <Link
-            className="button button--outline button--secondary button--lg margin-left--md"
-            href="https://github.com/MauroVerberkt/DotnetHelpers">
-            GitHub
-          </Link>
-        </div>
-      </div>
-    </header>
+        <Link className={styles.adrLink} to="/architecture/decisions/result-over-exceptions">
+          Read the decision →
+        </Link>
+      </aside>
+    </section>
   );
 }
 
-function ValueProp({title, description, details}: {title: string; description: string; details: string[]}) {
+function Approach() {
   return (
-    <div className={clsx('col col--4')}>
-      <div className={styles.valueProp}>
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
-        <ul className={styles.valuePropDetails}>
-          {details.map((detail, idx) => (
-            <li key={idx}>{detail}</li>
-          ))}
-        </ul>
+    <section className={styles.approach}>
+      <span className={styles.sectionLabel}>APPROACH</span>
+      <Heading as="h2" className={styles.approachTitle}>
+        The type system as your safety net.
+      </Heading>
+      <div className={styles.approachBody}>
+        <p>
+          Operations return Result&lt;T&gt; instead of throwing. Values use Option&lt;T&gt; instead of null.
+          Business rules are defined in JSON and generated as strongly-typed C# classes at compile time.
+          Roslyn analyzers catch violations before code runs. Source generators eliminate reflection.
+        </p>
+        <p className={styles.approachMuted}>
+          Every package is independently consumable. Zero cross-dependencies unless explicitly designed.
+        </p>
       </div>
-    </div>
+    </section>
   );
 }
 
-function HomepageValueProps() {
+function Packages() {
   return (
-    <section className={styles.valueProps}>
-      <div className="container">
-        <div className="row">
-          <ValueProp
-            title="Explicit over Implicit"
-            description="No exceptions for control flow. No nulls sneaking through. The type system tells you exactly what can fail and forces you to handle it."
-            details={[
-              'Result<T> for operations that can fail',
-              'Option<T> for values that may be absent',
-              'Compiler-enforced handling of both paths',
-            ]}
-          />
-          <ValueProp
-            title="Compile-time over Runtime"
-            description="Source generators and Roslyn analyzers replace runtime reflection and magic strings. Errors are caught before your code ever runs."
-            details={[
-              'Business rules defined in JSON, generated as C# classes',
-              'Analyzers validate correct usage at build time',
-              'Zero runtime reflection cost',
-            ]}
-          />
-          <ValueProp
-            title="Composable by Design"
-            description="Everything chains. Build pipelines where failures propagate automatically and operations compose naturally."
-            details={[
-              'Map, Bind, Match — full monadic composition',
-              'Async and CancellationToken support throughout',
-              'Independent packages, zero cross-dependencies',
-            ]}
-          />
+    <section className={styles.packages}>
+      <span className={styles.sectionLabel}>PACKAGES</span>
+      <div className={styles.packagesPrimary}>
+        <div className={styles.packageItem}>
+          <Heading as="h3">HelperMonads</Heading>
+          <p>Result&lt;T&gt; and Option&lt;T&gt; with full async composition, CancellationToken support, and monadic chaining</p>
+        </div>
+        <div className={styles.packageItem}>
+          <Heading as="h3">BusinessRules</Heading>
+          <p>JSON-defined rules → source-generated C# classes + Roslyn analyzers for compile-time validation</p>
+        </div>
+      </div>
+      <div className={styles.packagesSecondary}>
+        <div className={styles.packageSecondaryItem}>
+          <span className={styles.packageName}>BusinessRules.ResultExtensions</span>
+          <span className={styles.packageDesc}>— validation → Result bridge</span>
+        </div>
+        <div className={styles.packageSecondaryItem}>
+          <span className={styles.packageName}>BusinessRules.Wcf</span>
+          <span className={styles.packageDesc}>— WCF FaultException integration</span>
         </div>
       </div>
     </section>
   );
 }
 
-function HomepageEngineering() {
-  const items = [
-    'Source generators over reflection',
-    'Roslyn analyzers for compile-time validation',
-    'Independent packages — use what you need',
-    'Deterministic builds with SourceLink',
-    'Full async/CancellationToken support',
-    'XML docs and nullable annotations throughout',
-  ];
-
+function PageFooter() {
   return (
-    <section className={styles.engineering}>
-      <div className="container">
-        <Heading as="h2" className="text--center margin-bottom--lg">
-          Engineering Principles
-        </Heading>
-        <div className={styles.engineeringGrid}>
-          {items.map((item, idx) => (
-            <div key={idx} className={styles.engineeringItem}>
-              {item}
-            </div>
-          ))}
-        </div>
+    <section className={styles.pageFooter}>
+      <div className={styles.metrics}>
+        <a href="https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml" className={styles.metricLive}>
+          <span className={styles.metricDot} />
+          CI passing
+        </a>
+        <a href="https://app.codecov.io/github/MauroVerberkt/DotnetHelpers" className={styles.metricLive}>
+          <span className={styles.metricDot} />
+          Coverage
+        </a>
+        <span className={styles.metricStatic}>.NET 8.0+</span>
+        <span className={styles.metricStatic}>MIT</span>
+      </div>
+      <div className={styles.signoff}>
+        <p className={styles.signoffTagline}>Clear architecture. Confident execution.</p>
+        <p className={styles.signoffCopyright}>© 2026 Mauro Verberkt</p>
       </div>
     </section>
   );
 }
 
 export default function Home(): ReactNode {
-  const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
       title="Home"
-      description="Production-grade functional building blocks for .NET">
-      <HomepageHeader />
-      <main>
-        <HomepageValueProps />
-        <HomepageEngineering />
+      description="Production-grade functional building blocks for .NET"
+      noFooter>
+      <main className={styles.landing}>
+        <Hero />
+        <CodeArtifact />
+        <Approach />
+        <Packages />
+        <PageFooter />
       </main>
     </Layout>
   );

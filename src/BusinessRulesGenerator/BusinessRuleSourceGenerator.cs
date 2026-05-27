@@ -64,7 +64,7 @@ public class BusinessRuleSourceGenerator : IIncrementalGenerator
                     }
 
                     // Generate separate file per category
-                    var fileName = System.IO.Path.GetFileNameWithoutExtension(jsonData.Path);
+                    var fileName = Path.GetFileNameWithoutExtension(jsonData.Path);
                     var hintName = $"{fileName}.{SanitizeNamespace(categoryGroup.Key)}.g.cs";
                     
                     spc.AddSource(hintName, SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));

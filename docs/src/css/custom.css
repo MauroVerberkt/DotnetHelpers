@@ -1,27 +1,92 @@
 /**
- * DotnetHelpers Theme
- * Based on .NET purple color scheme
+ * DotnetHelpers Design System
+ * Dark-only. Geist + JetBrains Mono. Indigo accent.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
-  --ifm-color-primary: #512bd4;
-  --ifm-color-primary-dark: #4825bf;
-  --ifm-color-primary-darker: #4423b4;
-  --ifm-color-primary-darkest: #381d94;
-  --ifm-color-primary-light: #6341d9;
-  --ifm-color-primary-lighter: #6d4ddb;
-  --ifm-color-primary-lightest: #8a70e2;
+  --ifm-color-primary: #7C3AED;
+  --ifm-color-primary-dark: #6D28D9;
+  --ifm-color-primary-darker: #5B21B6;
+  --ifm-color-primary-darkest: #4C1D95;
+  --ifm-color-primary-light: #8B5CF6;
+  --ifm-color-primary-lighter: #A78BFA;
+  --ifm-color-primary-lightest: #C4B5FD;
+
+  --ifm-background-color: #0B0D10;
+  --ifm-background-surface-color: #111418;
+  --ifm-font-family-base: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', monospace;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(81, 43, 212, 0.1);
+  --ifm-heading-font-weight: 600;
+
+  --docusaurus-highlighted-code-line-bg: rgba(124, 58, 237, 0.15);
+
+  /* Custom tokens */
+  --bg-canvas: #0B0D10;
+  --bg-surface: #111418;
+  --bg-elevated: #161B22;
+  --border-subtle: #232833;
+  --border-default: #2B3240;
+  --text-primary: #F5F7FA;
+  --text-secondary: #B2BCCB;
+  --text-muted: #7B8494;
+  --accent-primary: #7C3AED;
+  --accent-primary-hover: #8B5CF6;
+  --accent-lime: #A3E635;
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #9b7ede;
-  --ifm-color-primary-dark: #8666d8;
-  --ifm-color-primary-darker: #7b59d5;
-  --ifm-color-primary-darkest: #5e35c7;
-  --ifm-color-primary-light: #b096e4;
-  --ifm-color-primary-lighter: #bba3e7;
-  --ifm-color-primary-lightest: #d5c9f0;
-  --docusaurus-highlighted-code-line-bg: rgba(155, 126, 222, 0.2);
+  --ifm-color-primary: #8B5CF6;
+  --ifm-color-primary-dark: #7C3AED;
+  --ifm-color-primary-darker: #6D28D9;
+  --ifm-color-primary-darkest: #5B21B6;
+  --ifm-color-primary-light: #A78BFA;
+  --ifm-color-primary-lighter: #C4B5FD;
+  --ifm-color-primary-lightest: #DDD6FE;
+
+  --ifm-background-color: #0B0D10;
+  --ifm-background-surface-color: #111418;
+
+  --docusaurus-highlighted-code-line-bg: rgba(139, 92, 246, 0.2);
 }
+
+/* Force dark background on navbar */
+.navbar {
+  background-color: var(--bg-canvas);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: none;
+}
+
+/* Code blocks */
+pre {
+  border: 1px solid var(--border-subtle);
+}
+
+/* Landing page should not have the default footer padding from docs */
+.footer {
+  background-color: var(--bg-canvas);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Force dark appearance regardless of toggle */
+:root,
+[data-theme='light'] {
+  --ifm-font-color-base: #F5F7FA;
+  --ifm-font-color-secondary: #B2BCCB;
+  --ifm-background-color: #0B0D10;
+  --ifm-background-surface-color: #111418;
+  --ifm-navbar-background-color: #0B0D10;
+  --ifm-footer-background-color: #0B0D10;
+  --ifm-card-background-color: #111418;
+  --ifm-hover-overlay: rgba(255, 255, 255, 0.05);
+  --ifm-color-emphasis-200: #232833;
+  --ifm-color-emphasis-300: #2B3240;
+}
+
+[data-theme='light'] .navbar {
+  background-color: var(--bg-canvas);
+}
+
+
