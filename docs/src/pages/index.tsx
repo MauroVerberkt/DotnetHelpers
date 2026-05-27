@@ -15,12 +15,33 @@ function HomepageHeader() {
         <Heading as="h1" className="hero__title">
           {siteConfig.title}
         </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className="hero__subtitle">
+          Production-grade building blocks for .NET — explicit error handling,
+          compile-time validated business rules, and null-safe optionals.
+        </p>
+        <div className={styles.badges}>
+          <a href="https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml">
+            <img src="https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml/badge.svg" alt="CI" />
+          </a>
+          {' '}
+          <a href="https://app.codecov.io/github/MauroVerberkt/DotnetHelpers">
+            <img src="https://codecov.io/github/MauroVerberkt/DotnetHelpers/graph/badge.svg" alt="codecov" />
+          </a>
+          {' '}
+          <img src="https://img.shields.io/badge/.NET-8.0+-purple.svg" alt=".NET 8.0+" />
+          {' '}
+          <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" />
+        </div>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
             to="/docs/getting-started/installation">
-            Get Started
+            Explore the Docs
+          </Link>
+          <Link
+            className="button button--outline button--secondary button--lg margin-left--md"
+            href="https://github.com/MauroVerberkt/DotnetHelpers">
+            GitHub
           </Link>
         </div>
       </div>
@@ -28,38 +49,82 @@ function HomepageHeader() {
   );
 }
 
-function Feature({title, description, emoji}: {title: string; description: string; emoji: string}) {
+function ValueProp({title, description, details}: {title: string; description: string; details: string[]}) {
   return (
     <div className={clsx('col col--4')}>
-      <div className="text--center padding-horiz--md">
-        <div style={{fontSize: '3rem', marginBottom: '1rem'}}>{emoji}</div>
+      <div className={styles.valueProp}>
         <Heading as="h3">{title}</Heading>
         <p>{description}</p>
+        <ul className={styles.valuePropDetails}>
+          {details.map((detail, idx) => (
+            <li key={idx}>{detail}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );
 }
 
-function HomepageFeatures() {
+function HomepageValueProps() {
   return (
-    <section className={styles.features}>
+    <section className={styles.valueProps}>
       <div className="container">
         <div className="row">
-          <Feature
-            emoji="🎯"
-            title="Result<T> Pattern"
-            description="Represent operation outcomes explicitly. No more exceptions for control flow - chain operations with Map, Bind, and transform data safely."
+          <ValueProp
+            title="Explicit over Implicit"
+            description="No exceptions for control flow. No nulls sneaking through. The type system tells you exactly what can fail and forces you to handle it."
+            details={[
+              'Result<T> for operations that can fail',
+              'Option<T> for values that may be absent',
+              'Compiler-enforced handling of both paths',
+            ]}
           />
-          <Feature
-            emoji="🔒"
-            title="Business Rules"
-            description="Define rules in JSON, get strongly-typed classes at compile time. Roslyn analyzers validate usage and source generators do the heavy lifting."
+          <ValueProp
+            title="Compile-time over Runtime"
+            description="Source generators and Roslyn analyzers replace runtime reflection and magic strings. Errors are caught before your code ever runs."
+            details={[
+              'Business rules defined in JSON, generated as C# classes',
+              'Analyzers validate correct usage at build time',
+              'Zero runtime reflection cost',
+            ]}
           />
-          <Feature
-            emoji="⚡"
-            title="Option<T> Type"
-            description="Eliminate null reference exceptions with an explicit Option type. Pattern match on presence or absence of values safely."
+          <ValueProp
+            title="Composable by Design"
+            description="Everything chains. Build pipelines where failures propagate automatically and operations compose naturally."
+            details={[
+              'Map, Bind, Match — full monadic composition',
+              'Async and CancellationToken support throughout',
+              'Independent packages, zero cross-dependencies',
+            ]}
           />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HomepageEngineering() {
+  const items = [
+    'Source generators over reflection',
+    'Roslyn analyzers for compile-time validation',
+    'Independent packages — use what you need',
+    'Deterministic builds with SourceLink',
+    'Full async/CancellationToken support',
+    'XML docs and nullable annotations throughout',
+  ];
+
+  return (
+    <section className={styles.engineering}>
+      <div className="container">
+        <Heading as="h2" className="text--center margin-bottom--lg">
+          Engineering Principles
+        </Heading>
+        <div className={styles.engineeringGrid}>
+          {items.map((item, idx) => (
+            <div key={idx} className={styles.engineeringItem}>
+              {item}
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -71,10 +136,11 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Home"
-      description="Functional patterns for .NET: Result, Option, and Business Rules">
+      description="Production-grade functional building blocks for .NET">
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
+        <HomepageValueProps />
+        <HomepageEngineering />
       </main>
     </Layout>
   );
