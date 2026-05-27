@@ -52,12 +52,12 @@ function Hero() {
     <section className={styles.hero}>
       <span className={styles.heroLabel}>.NET LIBRARY COLLECTION</span>
       <Heading as="h1" className={styles.heroTitle}>
-        <span>Result types.</span>
+        <span>Explicit failures.</span>
         <span>Source-generated rules.</span>
         <span className={styles.heroTitleMuted}>No reflection.</span>
       </Heading>
       <p className={styles.heroSubtitle}>
-        Production-grade building blocks for .NET that make the type system work for you.
+        Composable foundations for modern .NET.
       </p>
       <div className={styles.heroCta}>
         <Link className={styles.ctaPrimary} to="/docs/getting-started/installation">
