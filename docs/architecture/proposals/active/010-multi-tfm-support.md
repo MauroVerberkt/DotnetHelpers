@@ -1,7 +1,7 @@
 ---
 sidebar_position: 10
 title: "PROP-010: Multi-TFM Support"
-tags: [infra, packaging]
+tags: [infra, packaging, HelperMonads, BusinessRules]
 ---
 
 # PROP-010: Multi-TFM Support

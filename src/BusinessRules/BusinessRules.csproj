@@ -1,15 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>BusinessRulesManagement</PackageId>
     <Title>BusinessRules Management Framework</Title>
     <Description>A code generation-based framework for defining, managing, and enforcing business rules with Source Generators and Roslyn Analyzers</Description>
-    <Authors>Mauro Verberkt</Authors>
     <PackageTags>businessrules;validation;sourcegenerator;analyzer;codegen</PackageTags>
   </PropertyGroup>
 

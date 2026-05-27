@@ -1,5 +1,4 @@
-﻿using System;
-using BusinessRules.Utilities;
+﻿using BusinessRules.Utilities;
 
 namespace BusinessRules.Attributes;
 

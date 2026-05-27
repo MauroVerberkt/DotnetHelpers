@@ -1,15 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>HelperMonads</PackageId>
     <Title>Helper Monads</Title>
     <Description>Functional programming monads for C# including Result and Option types</Description>
-    <Authors>Mauro Verberkt</Authors>
     <PackageTags>monad;result;option;functional;railway</PackageTags>
   </PropertyGroup>
 
