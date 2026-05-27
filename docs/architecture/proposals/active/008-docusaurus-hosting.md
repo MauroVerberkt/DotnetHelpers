@@ -86,6 +86,10 @@ baseUrl: '/DotnetHelpers/',
 
 - Settings → Pages → Source: "GitHub Actions" (not "Deploy from a branch")
 
+### Post-Deploy Tasks
+
+- Update root `README.md` docs link from "run locally" instructions to the hosted URL (`https://mauroverberkt.github.io/DotnetHelpers/`)
+
 ## Open Questions
 
 - ~~Do we want PR preview deployments, or is local preview sufficient?~~ **Local preview is sufficient.** Single maintainer, `npm start` works fine.

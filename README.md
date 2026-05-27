@@ -1,23 +1,33 @@
 [![CI](https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml/badge.svg)](https://github.com/MauroVerberkt/DotnetHelpers/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/github/MauroVerberkt/DotnetHelpers/graph/badge.svg)](https://app.codecov.io/github/MauroVerberkt/DotnetHelpers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-8.0+-purple.svg)](https://dotnet.microsoft.com)
 
 # DotnetHelpers
 
-Functional patterns for .NET: **Result**, **Option**, and **Business Rules**.
+Functional building blocks for .NET: explicit error handling with **Result\<T\>**, null-safe optionals with **Option\<T\>**, and compile-time validated **Business Rules** powered by source generators and Roslyn analyzers.
 
-## Libraries
+No runtime reflection. No exceptions for control flow. Strong typing all the way down.
+
+## Packages
 
 | Package | Description |
 |---------|-------------|
-| **HelperMonads** | `Result<T>` and `Option<T>` monadic types for safer C# |
-| **BusinessRulesManagement** | Code generation-based business rule framework with Roslyn analyzers |
-| **BusinessRules.ResultExtensions** | Bridge between BusinessRules and Result pattern |
-| **BusinessRules.Wcf** | WCF fault exception support for business rules |
+| **HelperMonads** | `Result<T>` and `Option<T>` monadic types — Map, Bind, Match with full async and CancellationToken support |
+| **BusinessRulesManagement** | Define business rules in JSON, get strongly-typed classes at compile time via source generation |
+| **BusinessRules.ResultExtensions** | Bridge between BusinessRules validation and the Result pattern |
+| **BusinessRules.Wcf** | WCF `FaultException` support for business rule violations |
 
-## Quick Example
+## Getting Started
+
+```bash
+dotnet add package HelperMonads
+```
 
 ```csharp
-// Result pattern - explicit error handling without exceptions
+using HelperMonads;
+
+// Explicit success/failure — no exceptions for expected error paths
 public Result<User> GetUser(int id)
 {
     var user = _repository.Find(id);
@@ -26,29 +36,27 @@ public Result<User> GetUser(int id)
         : Result.Failure<User>(new UserNotFoundException(id));
 }
 
-// Chain operations safely
-var result = GetUser(42)
+// Chain operations — failures short-circuit automatically
+var email = GetUser(42)
     .Map(user => user.Email)
-    .OnFailure(error => _logger.LogError(error, "Failed"));
+    .OnSuccess(addr => _logger.LogInformation("Found: {Email}", addr))
+    .OnFailure(error => _logger.LogWarning(error, "User not found"));
 ```
+
+## Status
+
+> **Pre-release** — All packages are at `0.x`. APIs are stabilizing but may still change.
+
+See [active proposals](docs/architecture/proposals/active/) for planned work.
 
 ## Documentation
 
-The full documentation site is built with [Docusaurus](https://docusaurus.io/).
+The full documentation site is built with [Docusaurus](https://docusaurus.io/):
 
 ```bash
 cd docs
 npm install
-npm run start
+npm start
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
-
-## Requirements
-
-- .NET 8.0+
-- C# 12+
-
-## CI & Quality
-
-All changes go through pull requests with automated CI. Tests and coverage run on every PR via GitHub Actions. Coverage is tracked on [Codecov](https://app.codecov.io/github/MauroVerberkt/DotnetHelpers) with both line and branch metrics.
