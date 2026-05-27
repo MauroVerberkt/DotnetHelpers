@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		BusinessRules.slnf = BusinessRules.slnf
 		Directory.Build.props = Directory.Build.props
 		nuget.config = nuget.config
+		Directory.Packages.props = Directory.Packages.props
+		LICENSE = LICENSE
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperMonads", "src\HelperMonads\HelperMonads.csproj", "{25C8842C-1CB9-FDDB-AF86-3E8C23BB97F4}"
