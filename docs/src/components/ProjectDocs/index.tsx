@@ -13,7 +13,7 @@ interface DocEntry {
   description: string;
   permalink: string;
   tags: string[];
-  category: 'decisions' | 'design';
+  category: 'proposals' | 'decisions' | 'design';
 }
 
 interface PluginData {
@@ -24,6 +24,10 @@ export default function ProjectDocs({project}: ProjectDocsProps): React.JSX.Elem
   const {docs} = usePluginData('architecture-docs-data') as PluginData;
 
   const projectDocs = docs.filter((doc) => doc.tags.includes(project));
+
+  const proposals = projectDocs
+    .filter((doc) => doc.category === 'proposals')
+    .sort((a, b) => a.id.localeCompare(b.id));
 
   const decisions = projectDocs
     .filter((doc) => doc.category === 'decisions')
@@ -38,6 +42,17 @@ export default function ProjectDocs({project}: ProjectDocsProps): React.JSX.Elem
       <Link to="/architecture/overview" className={styles.backLink}>
         ← Back to Architecture Overview
       </Link>
+
+      {proposals.length > 0 && (
+        <section className={styles.section}>
+          <h2>Proposals</h2>
+          <div className={styles.cardGrid}>
+            {proposals.map((doc) => (
+              <DocCard key={doc.id} doc={doc} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {decisions.length > 0 && (
         <section className={styles.section}>

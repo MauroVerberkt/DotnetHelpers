@@ -14,7 +14,8 @@ function parseFrontmatter(content: string): Record<string, string | string[]> {
   const yaml = match[1];
   const result: Record<string, string | string[]> = {};
 
-  for (const line of yaml.split('\n')) {
+  for (const rawLine of yaml.split('\n')) {
+    const line = rawLine.replace(/\r$/, '');
     const kvMatch = line.match(/^(\w+):\s*(.+)$/);
     if (kvMatch) {
       const [, key, value] = kvMatch;
@@ -104,42 +105,52 @@ const config: Config = {
             category: string;
           }> = [];
 
-          for (const category of ['proposals', 'decisions', 'design']) {
-            const dirPath = path.join(architecturePath, category);
-            if (!fs.existsSync(dirPath)) continue;
+          function scanDirectory(dirPath: string, category: string, subDir?: string) {
+            if (!fs.existsSync(dirPath)) return;
 
-            const files = fs.readdirSync(dirPath).filter((f) => f.endsWith('.md') || f.endsWith('.mdx'));
+            const entries = fs.readdirSync(dirPath, {withFileTypes: true});
 
-            for (const file of files) {
-              const filePath = path.join(dirPath, file);
-              const content = fs.readFileSync(filePath, 'utf-8');
-              const frontmatter = parseFrontmatter(content);
+            for (const entry of entries) {
+              if (entry.isDirectory()) {
+                scanDirectory(path.join(dirPath, entry.name), category, entry.name);
+              } else if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) {
+                if (entry.name.startsWith('_')) continue;
 
-              const slug = file.replace(/\.(md|mdx)$/, '').replace(/^\d+-/, '');
-              const id = `${category}/${slug}`;
-              const permalink = `/architecture/${category}/${slug}`;
+                const filePath = path.join(dirPath, entry.name);
+                const content = fs.readFileSync(filePath, 'utf-8');
+                const frontmatter = parseFrontmatter(content);
 
-              let description = (frontmatter.description as string) || '';
-              if (!description) {
-                const bodyContent = content.split('---').slice(2).join('---').trim();
-                const lines = bodyContent.split('\n');
-                const firstParagraph = lines
-                  .filter((l) => l.trim() && !l.startsWith('#') && !l.startsWith('**Status'))
-                  .slice(0, 2)
-                  .join(' ')
-                  .trim();
-                description = firstParagraph.slice(0, 200);
+                const slug = entry.name.replace(/\.(md|mdx)$/, '').replace(/^\d+-/, '');
+                const pathSegment = subDir ? `${subDir}/${slug}` : slug;
+                const id = `${category}/${pathSegment}`;
+                const permalink = `/architecture/${category}/${pathSegment}`;
+
+                let description = (frontmatter.description as string) || '';
+                if (!description) {
+                  const bodyContent = content.split('---').slice(2).join('---').trim();
+                  const lines = bodyContent.split('\n');
+                  const firstParagraph = lines
+                    .filter((l) => l.trim() && !l.startsWith('#') && !l.startsWith('**Status'))
+                    .slice(0, 2)
+                    .join(' ')
+                    .trim();
+                  description = firstParagraph.slice(0, 200);
+                }
+
+                docs.push({
+                  id,
+                  title: (frontmatter.title as string) || slug,
+                  description,
+                  permalink,
+                  tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
+                  category,
+                });
               }
-
-              docs.push({
-                id,
-                title: (frontmatter.title as string) || slug,
-                description,
-                permalink,
-                tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
-                category,
-              });
             }
+          }
+
+          for (const category of ['proposals', 'decisions', 'design']) {
+            scanDirectory(path.join(architecturePath, category), category);
           }
 
           setGlobalData({docs});

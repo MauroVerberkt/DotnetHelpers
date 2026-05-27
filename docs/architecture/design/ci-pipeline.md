@@ -2,7 +2,7 @@
 sidebar_position: 5
 title: CI Pipeline
 description: GitHub Actions CI/CD architecture, coverage reporting, and branch protection
-tags: [infra, testing]
+tags: [infra, testing, HelperMonads, BusinessRules]
 keywords:
   - ci
   - github-actions
