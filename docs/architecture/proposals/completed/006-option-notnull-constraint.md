@@ -58,4 +58,4 @@ Implemented as proposed. Both open questions resolved:
 1. **IEquatable**: Yes — added `IEquatable<Option<TValue>>` to `Option<TValue>` for consistency with `Result<TData>`. Includes `Equals`, `GetHashCode`, and proper structural equality (two `Some` are equal if values are equal, two `None` are always equal).
 2. **Consumer survey**: Not needed — package is pre-1.0, and the constraint only breaks misuse (`Option<string?>`).
 
-See [ADR-009](../decisions/009-option-notnull-and-iequatable.md) for the formal decision record.
+See [ADR-009](../../decisions/009-option-notnull-and-iequatable.md) for the formal decision record.
