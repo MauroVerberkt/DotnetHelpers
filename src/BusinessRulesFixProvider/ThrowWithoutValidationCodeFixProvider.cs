@@ -48,16 +48,20 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
 
         var (ruleKey, className) = TryExtractRuleInfo(throwStatement, semanticModel);
 
+        // Only offer the fix if we can extract enough info to produce a valid attribute
+        if (ruleKey == null && className == null)
+            return;
+
         context.RegisterCodeFix(
             CodeAction.Create(
                 title: className != null ? $"Add [ImplementsBusinessRule({className}.Key)]" : 
-                       ruleKey != null ? $"Add [ImplementsBusinessRule(\"{ruleKey}\")]" : Title,
+                       $"Add [ImplementsBusinessRule(\"{ruleKey}\")]",
                 createChangedDocument: c => AddValidatesAttributeAsync(context.Document, methodDeclaration, ruleKey, className, c),
                 equivalenceKey: Title),
             diagnostic);
     }
 
-    private (string? ruleKey, string? className) TryExtractRuleInfo(ThrowStatementSyntax throwStatement, SemanticModel semanticModel)
+    private static (string? ruleKey, string? className) TryExtractRuleInfo(ThrowStatementSyntax throwStatement, SemanticModel semanticModel)
     {
         // Handle: throw SomeRule.ToException() or throw SomeRule.ToFaultException()
         if (throwStatement.Expression is InvocationExpressionSyntax invocation &&
@@ -69,30 +73,6 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
                 var keyField = typeSymbol.GetMembers("Key").OfType<IFieldSymbol>().FirstOrDefault();
                 if (keyField?.ConstantValue is string key)
                     return (key, typeSymbol.Name);
-            }
-        }
-
-        // Handle: throw new BusinessRuleException(...)
-        if (throwStatement.Expression is not ObjectCreationExpressionSyntax objectCreation)
-            return (null, null);
-
-        var firstArg = objectCreation.ArgumentList?.Arguments.FirstOrDefault();
-        if (firstArg == null)
-            return (null, null);
-
-        var constantValue = semanticModel.GetConstantValue(firstArg.Expression);
-        if (constantValue.HasValue && constantValue.Value is string ruleKey)
-            return (ruleKey, null);
-
-        if (firstArg.Expression is MemberAccessExpressionSyntax memberAccessArg &&
-            memberAccessArg.Name.Identifier.Text == "Key")
-        {
-            var symbol = semanticModel.GetSymbolInfo(memberAccessArg).Symbol;
-            if (symbol is IFieldSymbol fieldSymbol)
-            {
-                var fieldValue = fieldSymbol.ConstantValue;
-                if (fieldValue is string key)
-                    return (key, fieldSymbol.ContainingType?.Name);
             }
         }
 
@@ -148,10 +128,9 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
 
         if (alreadyHasAttribute)
             return document;
-        
-        
+
         AttributeListSyntax attributeList;
-        
+
         if (className != null)
         {
             // Generate: [ImplementsBusinessRule(ClassName.Key)]
@@ -168,7 +147,7 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
                             SyntaxFactory.SingletonSeparatedList(
                                 SyntaxFactory.AttributeArgument(memberAccess))))));
         }
-        else if (ruleKey != null)
+        else
         {
             // Generate: [ImplementsBusinessRule("RULE_KEY")]
             attributeList = SyntaxFactory.AttributeList(
@@ -180,15 +159,7 @@ public class ThrowWithoutValidationCodeFixProvider : CodeFixProvider
                                 SyntaxFactory.AttributeArgument(
                                     SyntaxFactory.LiteralExpression(
                                         SyntaxKind.StringLiteralExpression,
-                                        SyntaxFactory.Literal(ruleKey))))))));
-        }
-        else
-        {
-            // Generate: [ImplementsBusinessRule]
-            attributeList = SyntaxFactory.AttributeList(
-                SyntaxFactory.SingletonSeparatedList(
-                    SyntaxFactory.Attribute(
-                        SyntaxFactory.IdentifierName("ImplementsBusinessRule"))));
+                                        SyntaxFactory.Literal(ruleKey!))))))));
         }
 
         var leadingTrivia = methodDeclaration.GetLeadingTrivia();

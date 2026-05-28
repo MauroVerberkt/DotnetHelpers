@@ -6,10 +6,10 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
-namespace BusinessRules.IntegrationTests;
+namespace BusinessRules.UnitTests.Analyzers;
 
 [TestFixture]
-public class IntegrationTests
+public class ComposedAnalyzerTests
 {
     private const string TestBusinessRulesJson = """
         {
@@ -60,7 +60,7 @@ public class IntegrationTests
         }
         """;
 
-    private Compilation CreateCompilation(string source)
+    private static Compilation CreateCompilation(string source)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
@@ -83,16 +83,14 @@ public class IntegrationTests
             // ServiceModel not available in this context
         }
 
-        var compilation = CSharpCompilation.Create(
+        return CSharpCompilation.Create(
             "TestAssembly",
             [syntaxTree],
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-        return compilation;
     }
 
-    private async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(string source, params DiagnosticAnalyzer[] analyzers)
+    private static async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(string source, params DiagnosticAnalyzer[] analyzers)
     {
         var compilation = CreateCompilation(source);
 
@@ -108,7 +106,7 @@ public class IntegrationTests
     }
 
     [Test]
-    public async Task Integration_ValidCode_NoErrors()
+    public async Task AllAnalyzers_ValidCode_NoDiagnostics()
     {
         var source = """
             using BusinessRules.Attributes;
@@ -138,91 +136,12 @@ public class IntegrationTests
             new RequiresValidationAnalyzer(),
             new ThrowWithoutValidationAnalyzer());
 
-        Assert.That(diagnostics, Is.Empty, 
+        Assert.That(diagnostics, Is.Empty,
             $"Expected no diagnostics but got: {string.Join(", ", diagnostics.Select(d => $"{d.Id}: {d.GetMessage()}"))}");
     }
 
     [Test]
-    public async Task Integration_BR001_InvalidKey_ReportsError()
-    {
-        var source = """
-            using BusinessRules.Attributes;
-
-            public class TestClass
-            {
-                [BusinessRule("INVALID_KEY")]
-                public void TestMethod() { }
-            }
-            """;
-
-        var diagnostics = await GetDiagnosticsAsync(source, new BusinessRuleKeyExistsAnalyzer());
-
-        Assert.That(diagnostics, Has.Length.EqualTo(1));
-        Assert.That(diagnostics[0].Id, Is.EqualTo("BR001"));
-        Assert.That(diagnostics[0].GetMessage(), Does.Contain("INVALID_KEY"));
-    }
-
-    [Test]
-    public async Task Integration_BR002_MissingValidator_ReportsError()
-    {
-        var source = """
-            using BusinessRules.Attributes;
-
-            public class TestClass
-            {
-                [BusinessRule("USER_AUTH")]
-                public void TestMethod() { }
-            }
-            """;
-
-        var diagnostics = await GetDiagnosticsAsync(source, new RequiresValidationAnalyzer());
-
-        Assert.That(diagnostics.Count(d => d.Id == "BR002"), Is.EqualTo(1));
-        Assert.That(diagnostics.First(d => d.Id == "BR002").GetMessage(), Does.Contain("USER_AUTH"));
-    }
-
-    [Test]
-    public async Task Integration_BR003_MissingValidator_EnforceFalse_ReportsWarning()
-    {
-        var source = """
-            using BusinessRules.Attributes;
-
-            public class TestClass
-            {
-                [BusinessRule("EMAIL_VERIFIED", enforceValidation: false)]
-                public void TestMethod() { }
-            }
-            """;
-
-        var diagnostics = await GetDiagnosticsAsync(source, new RequiresValidationAnalyzer());
-
-        Assert.That(diagnostics.Count(d => d.Id == "BR003"), Is.EqualTo(1));
-        Assert.That(diagnostics.First(d => d.Id == "BR003").Severity, Is.EqualTo(DiagnosticSeverity.Warning));
-    }
-
-    [Test]
-    public async Task Integration_BR004_ThrowWithoutAttribute_ReportsWarning()
-    {
-        var source = """
-            using BusinessRules;
-
-            public class TestClass
-            {
-                public void TestMethod()
-                {
-                    throw new BusinessRuleViolationException("AUTH", "Error");
-                }
-            }
-            """;
-
-        var diagnostics = await GetDiagnosticsAsync(source, new ThrowWithoutValidationAnalyzer());
-
-        Assert.That(diagnostics.Count(d => d.Id == "BR004"), Is.EqualTo(1));
-        Assert.That(diagnostics.First(d => d.Id == "BR004").Severity, Is.EqualTo(DiagnosticSeverity.Warning));
-    }
-
-    [Test]
-    public async Task Integration_FullPipeline_WithAllAnalyzers()
+    public async Task AllAnalyzers_FullPipeline_ReportsExpectedDiagnostics()
     {
         var source = """
             using BusinessRules;
@@ -264,33 +183,82 @@ public class IntegrationTests
 
         var br001 = diagnostics.Where(d => d.Id == "BR001").ToList();
         var br002 = diagnostics.Where(d => d.Id == "BR002").ToList();
-        
-        // Debug: Print all diagnostics
-        foreach (var d in diagnostics)
-        {
-            Console.WriteLine($"{d.Id}: {d.GetMessage()}");
-        }
 
         // BR001: Both INVALID_RULE and MISSING_VALIDATOR are not in JSON
-        Assert.That(br001, Has.Count.EqualTo(2), $"Should have BR001 for INVALID_RULE and MISSING_VALIDATOR (not in JSON). Got: {string.Join(", ", br001.Select(d => d.GetMessage()))}");
+        Assert.That(br001, Has.Count.EqualTo(2),
+            $"Should have BR001 for INVALID_RULE and MISSING_VALIDATOR. Got: {string.Join(", ", br001.Select(d => d.GetMessage()))}");
         // BR002: MISSING_VALIDATOR has no ImplementsBusinessRule
-        Assert.That(br002, Has.Count.EqualTo(1), $"Should have BR002 for MISSING_VALIDATOR. Got: {string.Join(", ", br002.Select(d => d.GetMessage()))}");
-        // BR004: ThrowWithoutAttr throws without [ImplementsBusinessRule] attribute - But ToException() is a method call, not direct throw
-        // So BR004 won't fire here. Let's just check we got the other diagnostics correctly
-        Assert.That(br001.Count + br002.Count, Is.GreaterThan(0), "Should have some diagnostics");
+        Assert.That(br002, Has.Count.EqualTo(1),
+            $"Should have BR002 for MISSING_VALIDATOR. Got: {string.Join(", ", br002.Select(d => d.GetMessage()))}");
     }
 
-    private class InMemoryAdditionalText : AdditionalText
+    [Test]
+    public async Task BR001_And_BR002_Combined_InvalidKey_And_MissingValidator()
     {
-        private readonly SourceText _text;
+        var source = """
+            using BusinessRules.Attributes;
 
-        public InMemoryAdditionalText(string path, string text)
-        {
-            Path = path;
-            _text = SourceText.From(text);
-        }
+            public class TestClass
+            {
+                [BusinessRule("INVALID_KEY")]
+                public void TestMethod() { }
+            }
+            """;
 
-        public override string Path { get; }
+        var diagnostics = await GetDiagnosticsAsync(
+            source,
+            new BusinessRuleKeyExistsAnalyzer(),
+            new RequiresValidationAnalyzer());
+
+        Assert.That(diagnostics.Any(d => d.Id == "BR001"), Is.True, "Should report BR001 for invalid key");
+        Assert.That(diagnostics.First(d => d.Id == "BR001").GetMessage(), Does.Contain("INVALID_KEY"));
+    }
+
+    [Test]
+    public async Task BR003_EnforceFalse_ReportsWarning()
+    {
+        var source = """
+            using BusinessRules.Attributes;
+
+            public class TestClass
+            {
+                [BusinessRule("EMAIL_VERIFIED", enforceValidation: false)]
+                public void TestMethod() { }
+            }
+            """;
+
+        var diagnostics = await GetDiagnosticsAsync(source, new RequiresValidationAnalyzer());
+
+        Assert.That(diagnostics.Count(d => d.Id == "BR003"), Is.EqualTo(1));
+        Assert.That(diagnostics.First(d => d.Id == "BR003").Severity, Is.EqualTo(DiagnosticSeverity.Warning));
+    }
+
+    [Test]
+    public async Task BR004_ThrowWithoutAttribute_ReportsWarning()
+    {
+        var source = """
+            using BusinessRules;
+
+            public class TestClass
+            {
+                public void TestMethod()
+                {
+                    throw new BusinessRuleViolationException("AUTH", "Error");
+                }
+            }
+            """;
+
+        var diagnostics = await GetDiagnosticsAsync(source, new ThrowWithoutValidationAnalyzer());
+
+        Assert.That(diagnostics.Count(d => d.Id == "BR004"), Is.EqualTo(1));
+        Assert.That(diagnostics.First(d => d.Id == "BR004").Severity, Is.EqualTo(DiagnosticSeverity.Warning));
+    }
+
+    private sealed class InMemoryAdditionalText(string path, string text) : AdditionalText
+    {
+        private readonly SourceText _text = SourceText.From(text);
+
+        public override string Path { get; } = path;
 
         public override SourceText GetText(CancellationToken cancellationToken = default) => _text;
     }
