@@ -6,7 +6,7 @@ namespace HelperMonads;
 /// Represents an option that contains a value.
 /// </summary>
 /// <typeparam name="TValue">The type of the value, which must be a reference type (class).</typeparam>
-public sealed class Some<TValue>([DisallowNull] TValue value) : Option<TValue>
+public sealed class Some<TValue>([DisallowNull] TValue value) : Option<TValue> where TValue : notnull
 {
     /// <summary>
     /// Gets a value indicating that the option contains a value.
