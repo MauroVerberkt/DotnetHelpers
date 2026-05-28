@@ -95,4 +95,4 @@ The `BusinessRuleResolver` was deleted along with the `Requirement` property on 
 - `ImplementsBusinessRuleAttribute.Requirement` — removed (breaking change)
 - All tests pass, zero build warnings
 
-See: [ADR-008: Remove BusinessRuleResolver Runtime Reflection](../decisions/008-remove-business-rule-resolver.md)
+See: [ADR-008: Remove BusinessRuleResolver Runtime Reflection](../../decisions/008-remove-business-rule-resolver.md)
