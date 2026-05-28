@@ -6,10 +6,10 @@ tags: [docs]
 
 # PROP-008: Docusaurus Hosting
 
-**Status:** ready  
+**Status:** done  
 **Size:** small  
 **Created:** 2025-05-25  
-**Updated:** 2026-05-27
+**Updated:** 2026-05-28
 
 ## Problem / Motivation
 
@@ -143,4 +143,13 @@ Both options require PROP-009 to publish a machine-readable summary artifact (e.
 
 ## Outcome
 
-_Filled when status changes to done/parked. Link to ADR(s) if applicable._
+Done. GitHub Pages deployment implemented:
+
+- `.github/workflows/deploy-docs.yml` deploys on push to `main` when `docs/**` changes
+- `docusaurus.config.ts` configured with correct `url` and `baseUrl`
+- GitHub repo settings configured: Pages source set to "GitHub Actions"
+- README updated with link to hosted site
+
+Site live at: https://mauroverberkt.github.io/DotnetHelpers/
+
+Stretch goal (project health dashboard) can now be pursued — PROP-009 (CI pipeline) is complete.
