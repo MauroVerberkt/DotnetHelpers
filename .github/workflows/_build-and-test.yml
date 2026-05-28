@@ -49,20 +49,25 @@ jobs:
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: ./test-results
           files: "**/*cobertura*.xml"
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Upload test results to Codecov
+      - name: Find JUnit test result files
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        id: junit
+        run: echo "files=$(find ./test-results -name 'junit-*.xml' -type f | paste -sd ',' -)" >> $GITHUB_OUTPUT
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() && steps.junit.outputs.files != '' }}
+        uses: codecov/codecov-action@v6
         with:
-          directory: ./test-results
-          files: junit-*.xml
+          files: ${{ steps.junit.outputs.files }}
           report_type: test_results
+          disable_search: true
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
