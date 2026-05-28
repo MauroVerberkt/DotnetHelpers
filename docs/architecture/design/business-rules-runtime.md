@@ -98,26 +98,11 @@ flowchart LR
 | `[BusinessRule(key)]` | Declares a method/class is governed by a rule | BR002 ensures a validator exists |
 | `[ImplementsBusinessRule(key)]` | Declares a method implements the validation logic | BR004 checks throw is inside here |
 
-Both attributes resolve the `BusinessRuleBase` instance at construction time via `BusinessRuleResolver`.
+Both attributes are purely declarative markers carrying only the string key. Correctness is enforced at compile time by the Roslyn analyzers — no runtime resolution is performed.
 
-## BusinessRuleResolver
-
-A static utility providing runtime discovery of business rules through reflection:
-
-```csharp
-public static class BusinessRuleResolver
-{
-    public static BusinessRuleBase? FindBusinessRuleByKey(string key)
-    {
-        // Searches all loaded assemblies for static fields
-        // of type BusinessRuleBase with a matching key
-    }
-}
-```
-
-**When used:** At attribute construction time to resolve the rule key into a full `BusinessRuleBase` instance. This provides runtime access to rule metadata (description, category) from attributes.
-
-**Trade-off:** This is the only place reflection is used. It runs once per attribute instance (typically at application startup during type loading).
+:::info Removed in ADR-008
+The `BusinessRuleResolver` and the `Requirement` property on these attributes were removed. Attributes no longer trigger reflection at construction time. See [ADR-008](../decisions/008-remove-business-rule-resolver.md).
+:::
 
 ## Exception Model
 

@@ -1,5 +1,3 @@
-using BusinessRules.Utilities;
-
 namespace BusinessRules.Attributes;
 
 /// <summary>
@@ -13,11 +11,4 @@ public class ImplementsBusinessRuleAttribute(string ruleKey) : Attribute
     /// The unique key identifying the business rule being implemented.
     /// </summary>
     public string RuleKey { get; } = ruleKey;
-
-    /// <summary>
-    /// The resolved business rule instance, looked up by <see cref="RuleKey"/> at runtime.
-    /// </summary>
-    public BusinessRuleBase Requirement { get; } = 
-        BusinessRuleResolver.FindBusinessRuleByKey(ruleKey)
-        ?? throw new ArgumentException($"BusinessRule with key '{ruleKey}' not found in any [BusinessRuleGroup] class.");
 }

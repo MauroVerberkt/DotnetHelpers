@@ -25,7 +25,7 @@ Use an **Incremental Source Generator** (`IIncrementalGenerator`) that reads `*.
 - Has `const string` fields for Key, Rule, Description, Category
 - Is organized into namespaces by category (e.g., `BusinessRules.Rules.Authentication`)
 
-A `BusinessRuleResolver` using reflection is retained as a runtime fallback for attribute-based lookup.
+~~A `BusinessRuleResolver` using reflection is retained as a runtime fallback for attribute-based lookup.~~ *(Removed in [ADR-008](./008-remove-business-rule-resolver.md))*
 
 ## Consequences
 
