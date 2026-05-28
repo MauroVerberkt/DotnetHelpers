@@ -51,12 +51,12 @@ See [active proposals](docs/architecture/proposals/active/) for planned work.
 
 ## Documentation
 
-The full documentation site is built with [Docusaurus](https://docusaurus.io/):
+📖 **[Read the docs](https://mauroverberkt.github.io/DotnetHelpers/)**
+
+To run locally:
 
 ```bash
 cd docs
 npm install
 npm start
 ```
-
-Then open [http://localhost:3000](http://localhost:3000).

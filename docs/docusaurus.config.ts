@@ -40,7 +40,7 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://mauroverbekt.github.io',
+  url: 'https://mauroverberkt.github.io',
   baseUrl: '/DotnetHelpers/',
 
   organizationName: 'MauroVerberkt',
