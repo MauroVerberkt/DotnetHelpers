@@ -3,10 +3,10 @@ using HelperMonads;
 namespace BusinessRules.ResultExtensions.UnitTests;
 
 /// <summary>
-///     Integration tests demonstrating real-world usage scenarios
+///     Composition tests demonstrating multi-step validation scenarios
 /// </summary>
 [TestFixture]
-public class IntegrationTests
+public class CompositionTests
 {
     private class User
     {

@@ -107,6 +107,24 @@ public class BusinessRuleResultExtensionsTests
     }
 
     [Test]
+    public void ValidateAndReturn_WithRule_WithBusinessRuleViolationException_ReturnsFailedResult()
+    {
+        // Arrange
+        var rule = new TestUserMustBeAdult();
+
+        // Act
+        var result = BusinessRuleResultExtensions.ValidateAndReturn<int>(
+            () => throw TestUserMustBeAdult.ToException(), rule);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
+        });
+    }
+
+    [Test]
     public void ValidateAndReturn_WithNullOperation_ThrowsArgumentNullException()
     {
         // Arrange
@@ -180,6 +198,28 @@ public class BusinessRuleResultExtensionsTests
         {
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(result.Data, Is.EqualTo(expectedValue));
+        });
+    }
+
+    [Test]
+    public async Task ValidateAndReturnAsync_WithRule_WithBusinessRuleViolationException_ReturnsFailedResult()
+    {
+        // Arrange
+        var rule = new TestUserMustBeAdult();
+
+        // Act
+        var result = await BusinessRuleResultExtensions.ValidateAndReturnAsync<string>(
+            async () =>
+            {
+                await Task.Delay(1);
+                throw TestUserMustBeAdult.ToException();
+            }, rule);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
     }
 
@@ -508,6 +548,21 @@ public class BusinessRuleResultExtensionsTests
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
             _ = result.ToBusinessRuleException(rule!));
+    }
+
+    [Test]
+    public void ToBusinessRuleException_WithBusinessRuleViolationError_ReturnsOriginalException()
+    {
+        // Arrange
+        var originalException = TestUserMustBeAdult.ToException();
+        var result = Result.Failure<string>(BusinessRuleResultExtensions.FromViolation(originalException));
+        var rule = new TestUserMustBeAdult();
+
+        // Act
+        var returnedException = result.ToBusinessRuleException(rule);
+
+        // Assert
+        Assert.That(returnedException, Is.SameAs(originalException));
     }
 
     [Test]
