@@ -49,6 +49,11 @@ var email = GetUser(42)
 
 See [active proposals](docs/architecture/proposals/active/) for planned work.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, branch naming
+conventions, commit message format, and CI workflow details.
+
 ## Documentation
 
 📖 **[Read the docs](https://mauroverberkt.github.io/DotnetHelpers/)**
