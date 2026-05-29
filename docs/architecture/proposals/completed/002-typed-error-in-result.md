@@ -6,7 +6,7 @@ tags: [HelperMonads]
 
 # PROP-002: Typed Error in Result&lt;TData&gt;
 
-**Status:** idea  
+**Status:** done  
 **Size:** large  
 **Created:** 2026-05-25  
 
@@ -61,4 +61,20 @@ Key additions to the API surface:
 
 ## Outcome
 
-_Pending_
+Decided against adding a second generic parameter `Result<TData, TError>`. Instead, replace
+the hardcoded `Exception?` with a lightweight `Error` record type:
+
+```csharp
+public record Error(string Message, string? Code = null, Exception? Exception = null);
+```
+
+Key decisions:
+- **No generic error type** — avoids chain composition pain (`MapError` everywhere) and extension method explosion
+- **Record** — value equality, immutability, `with` expressions
+- **Minimal factories** — `Error.Create(...)` and `Error.Unexpected(Exception)` only; no opinionated common errors
+- **`Code` is `string?`** — optional, not an enum; typed codes deferred to PROP-014
+- **Single error per Result** — aggregation deferred to PROP-013 (OneOrMany)
+- **Extensibility** — consumers add domain errors via their own static classes
+
+See: [ADR-010: Error Record Over Exception](../../decisions/010-error-record-over-exception.md)  
+Related: [PROP-013: OneOrMany Collection](../active/013-one-or-many-collection.md), [PROP-014: Source-Generated Typed Error Codes](../active/014-source-generated-error-codes.md)

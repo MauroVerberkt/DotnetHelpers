@@ -19,13 +19,13 @@ This guide shows you the core patterns in under 5 minutes.
 Use `Result<T>` to represent operations that can succeed or fail without throwing exceptions:
 
 ```csharp title="UserService.cs"
-using HelperMonads.Result;
+using HelperMonads;
 
 public Result<User> GetUser(int id)
 {
     var user = _repository.Find(id);
     if (user == null)
-        return Result.Failure<User>(new UserNotFoundException(id));
+        return Result.Failure<User>(Error.Create($"User {id} not found", "NOT_FOUND"));
 
     return Result.Success(user);
 }
@@ -37,7 +37,7 @@ Chain operations together using `Map` and `Bind`:
 var result = GetUser(42)
     .Map(user => user.Email)
     .OnSuccess(email => SendNotification(email))
-    .OnFailure(error => _logger.LogError(error, "Failed"));
+    .OnFailure(error => _logger.LogError("Failed: {Error}", error.Message));
 ```
 
 ## Business Rules

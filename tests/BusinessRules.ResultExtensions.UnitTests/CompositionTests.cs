@@ -3,10 +3,10 @@ using HelperMonads;
 namespace BusinessRules.ResultExtensions.UnitTests;
 
 /// <summary>
-///     Integration tests demonstrating real-world usage scenarios
+///     Composition tests demonstrating multi-step validation scenarios
 /// </summary>
 [TestFixture]
-public class IntegrationTests
+public class CompositionTests
 {
     private class User
     {
@@ -50,7 +50,7 @@ public class IntegrationTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var exception = result.Error as BusinessRuleViolationException;
+        var exception = result.Error?.Exception as BusinessRuleViolationException;
         Assert.That(exception, Is.Not.Null);
         Assert.That(exception!.Key, Is.EqualTo("TEST_USER_AGE_MIN"));
     }
@@ -69,7 +69,7 @@ public class IntegrationTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var exception = result.Error as BusinessRuleViolationException;
+        var exception = result.Error?.Exception as BusinessRuleViolationException;
         Assert.That(exception, Is.Not.Null);
         Assert.That(exception!.Key, Is.EqualTo("TEST_PWD_MIN_LENGTH"));
     }
@@ -88,7 +88,7 @@ public class IntegrationTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var exception = result.Error as BusinessRuleViolationException;
+        var exception = result.Error?.Exception as BusinessRuleViolationException;
         Assert.That(exception, Is.Not.Null);
         Assert.That(exception!.Key, Is.EqualTo("TEST_PWD_UPPERCASE"));
     }
@@ -107,7 +107,7 @@ public class IntegrationTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var exception = result.Error as BusinessRuleViolationException;
+        var exception = result.Error?.Exception as BusinessRuleViolationException;
         Assert.That(exception, Is.Not.Null);
         Assert.That(exception!.Key, Is.EqualTo("TEST_PWD_NUMBER"));
     }
@@ -145,7 +145,7 @@ public class IntegrationTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var exception = result.Error as BusinessRuleViolationException;
+        var exception = result.Error?.Exception as BusinessRuleViolationException;
         Assert.That(exception!.Key, Is.EqualTo("TEST_USER_AGE_MIN"));
     }
 
@@ -192,7 +192,7 @@ public class IntegrationTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var exception = result.Error as BusinessRuleViolationException;
+        var exception = result.Error?.Exception as BusinessRuleViolationException;
         Assert.That(exception!.Key, Is.EqualTo("TEST_USER_AGE_MIN"));
     }
 
@@ -215,7 +215,7 @@ public class IntegrationTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var exception = result.Error as BusinessRuleViolationException;
+        var exception = result.Error?.Exception as BusinessRuleViolationException;
         Assert.That(exception!.Key, Is.EqualTo("TEST_PWD_MIN_LENGTH"));
     }
 
@@ -239,7 +239,7 @@ public class IntegrationTests
     public void OnFailure_WithFailedResult_ExecutesAction()
     {
         // Arrange
-        Exception? capturedError = null;
+        Error? capturedError = null;
         var age = 16;
 
         // Act
@@ -251,7 +251,7 @@ public class IntegrationTests
         {
             Assert.That(result.IsFailure, Is.True);
             Assert.That(capturedError, Is.Not.Null);
-            Assert.That(capturedError, Is.InstanceOf<BusinessRuleViolationException>());
+            Assert.That(capturedError!.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
     }
 

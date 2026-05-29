@@ -27,7 +27,7 @@ The `Result<TData>` class represents the outcome of an operation, encapsulating 
 The `Result<TData>` class provides:
 
 - **Success and Failure States**: Indicates if the operation was successful or failed
-- **Data and Error Handling**: Holds data on success or error information (exception) on failure
+- **Data and Error Handling**: Holds data on success or error information on failure
 - **Functional Operations**: Methods for transforming data (`Map`), chaining operations (`Bind`), and performing side effects (`OnSuccess`, `OnFailure`)
 - **Asynchronous Support**: Async versions of all transformation and chaining functions
 
@@ -45,7 +45,7 @@ The `Result<TData>` class provides:
 | `IsSuccess` | Returns `true` if the operation succeeded |
 | `IsFailure` | Returns `true` if the operation failed |
 | `Data` | The data from a successful operation |
-| `Error` | The exception from a failed operation |
+| `Error` | The error from a failed operation |
 | `Map` | Transforms data if successful |
 | `MapAsync` | Async version of `Map` (with `CancellationToken` overload) |
 | `Bind` | Chains with another operation (doesn't pass data) |
@@ -67,7 +67,7 @@ public static Result<int> PerformOperation(bool isSuccess)
     if (isSuccess)
         return Result.Success(42);
     else
-        return Result.Failure<int>(new Exception("Something went wrong"));
+        return Result.Failure<int>(Error.Create("Something went wrong"));
 }
 
 // Check the result
@@ -118,7 +118,7 @@ public static Task<Result<int>> PerformOperationAsync(bool isSuccess)
     if (isSuccess)
         return Task.FromResult(Result.Success(42));
     else
-        return Task.FromResult(Result.Failure<int>(new Exception("Async operation failed")));
+        return Task.FromResult(Result.Failure<int>(Error.Create("Async operation failed")));
 }
 
 public static async Task<Result<int>> AnotherAsyncOperation()
@@ -139,7 +139,7 @@ public Result<UserDto> GetUserProfile(int userId)
             Email = user.Email
         })
         .OnSuccess(dto => _cache.Set($"user:{userId}", dto))
-        .OnFailure(error => _logger.LogWarning(error, "User {Id} not found", userId));
+        .OnFailure(error => _logger.LogWarning("User {Id} not found: {Error}", userId, error.Message));
 }
 ```
 
