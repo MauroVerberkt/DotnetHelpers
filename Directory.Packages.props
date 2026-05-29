@@ -13,6 +13,7 @@
 
   <!-- Runtime dependencies -->
   <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8"/>
     <PackageVersion Include="System.ServiceModel.Primitives" Version="8.1.2" />
   </ItemGroup>
 

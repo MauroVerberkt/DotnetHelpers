@@ -7,12 +7,11 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8"/>
+        <PackageReference Include="System.Text.Json" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\tools\HelperMonads.Package\HelperMonads.Package.csproj" />
         <ProjectReference Include="..\HelperMonads\HelperMonads.csproj" />
     </ItemGroup>
 

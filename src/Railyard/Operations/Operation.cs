@@ -1,8 +1,6 @@
-using System;
-using System.Linq;
 using System.Reflection;
-using HelperMonads.Result;
-using Newtonsoft.Json;
+using System.Text.Json;
+using HelperMonads;
 
 namespace Railyard.Operations;
 
@@ -38,7 +36,7 @@ internal abstract class Operation<TInput> : IOperation where TInput : class
     /// Validates the provided input.
     /// </summary>
     /// <param name="input">The input to be validated.</param>
-    /// <returns>An <see cref="Result{TData}" /> where TData is a <see cref="TInput" />, representing the validation result.</returns>
+    /// <returns>An <see cref="Result{TData}" /> representing the validation result.</returns>
     protected abstract Result<TInput> Validate(TInput input);
 
     /// <summary>
@@ -55,20 +53,20 @@ internal abstract class Operation<TInput> : IOperation where TInput : class
     /// </summary>
     /// <param name="input">The input string in JSON format.</param>
     /// <returns>
-    /// An <see cref="Result{TData}" /> where TData is a <see cref="TInput" />, representing the parsed input.
+    /// An <see cref="Result{TData}" /> representing the parsed input.
     /// </returns>
     private Result<TInput> ParseInput(string input)
     {
         try
         {
-            var deserializeInput = JsonConvert.DeserializeObject<TInput>(input);
+            var deserializeInput = JsonSerializer.Deserialize<TInput>(input);
             return deserializeInput == null
-                ? Result.Failure<TInput>(new InvalidInputException(typeof(TInput)))
+                ? Result.Failure<TInput>(RailyardErrors.InvalidInput<TInput>())
                 : Result.Success(deserializeInput);
         }
         catch (Exception exception)
         {
-            return Result.Failure<TInput>(exception);
+            return Result.Failure<TInput>(Error.Unexpected(exception));
         }
     }
 
