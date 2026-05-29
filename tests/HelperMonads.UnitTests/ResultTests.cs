@@ -14,7 +14,7 @@ namespace HelperMonads.UnitTests;
 [TestFixture]
 public class ResultTests
 {
-    private static Exception TestException => new(FailureMessage);
+    private static Error TestError => Error.Create(FailureMessage);
     private const string FailureMessage = "Failed";
     private const string SuccessMessage = "Success";
     private const string ProcessedMessage = "Processed";
@@ -38,13 +38,13 @@ public class ResultTests
     }
 
     /// <summary>
-    /// Tests that <see cref="Result.Failure{TData}(Exception)" /> correctly creates a failure result with only an error.
+    /// Tests that <see cref="Result.Failure{TData}(Error)" /> correctly creates a failure result with only an error.
     /// </summary>
     [Test]
     public void Failure_ShouldCreateFailureResult_WithErrorOnly()
     {
         // Act
-        var result = Result.Failure<string>(TestException);
+        var result = Result.Failure<string>(TestError);
 
         Assert.Multiple(() =>
         {
@@ -106,7 +106,7 @@ public class ResultTests
     public void Map_ShouldReturnFailure_WhenFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var result = failureResult.Map(data => data.ToUpper());
@@ -149,7 +149,7 @@ public class ResultTests
     public async Task MapAsync_ShouldReturnFailure_WhenFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var result = await failureResult.MapAsync(data => Task.FromResult(data.ToUpper()));
@@ -185,7 +185,7 @@ public class ResultTests
     public void ToString_ShouldReturnFailure_WhenResultIsFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var resultString = failureResult.ToString();
@@ -224,7 +224,7 @@ public class ResultTests
     public async Task MapAsync_ShouldReturnFailure_WhenResultIsFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var result = await failureResult.MapAsync((Func<string, CancellationToken, Task<int>>)Transform,
@@ -235,7 +235,7 @@ public class ResultTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error, Is.InstanceOf<Exception>());
+            Assert.That(result.Error, Is.InstanceOf<Error>());
         });
         return;
 
@@ -391,7 +391,7 @@ public class ResultTests
     public void OnSuccess_ShouldNotExecuteAction_WhenResultIsFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
         var actionExecuted = false;
 
         // Act
@@ -408,13 +408,13 @@ public class ResultTests
     }
     
     /// <summary>
-    /// Tests that <see cref="Result{TData}.OnFailure(Action{Exception})" /> executes the action when the result is a failure.
+    /// Tests that <see cref="Result{TData}.OnFailure(Action{Error})" /> executes the action when the result is a failure.
     /// </summary>
     [Test]
     public void OnFailure_ShouldExecuteAction_WhenResultIsFailure()
     {
         // Arrange
-        var  successResult = Result<string>.Failure(TestException);
+        var  successResult = Result<string>.Failure(TestError);
         var actionExecuted = false;
 
         // Act
@@ -425,14 +425,14 @@ public class ResultTests
         Assert.That(actionExecuted, Is.True);
         return;
 
-        void Action(Exception error)
+        void Action(Error error)
         {
             actionExecuted = true;
         }
     }
 
     /// <summary>
-    /// Tests that <see cref="Result{TData}.OnFailure(Action{Exception})" /> does not execute the action when the result is a success.
+    /// Tests that <see cref="Result{TData}.OnFailure(Action{Error})" /> does not execute the action when the result is a success.
     /// </summary>
     [Test]
     public void OnFailure_ShouldNotExecuteAction_WhenResultIsSuccess()
@@ -448,7 +448,7 @@ public class ResultTests
         Assert.That(actionExecuted, Is.False);
         return;
 
-        void Action(Exception error)
+        void Action(Error error)
         {
             actionExecuted = true;
         }
@@ -484,7 +484,7 @@ public class ResultTests
     public void Tap_ShouldExecuteAction_WhenResultIsFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
         var actionExecuted = false;
 
         // Act
@@ -542,7 +542,7 @@ public class ResultTests
     {
         // Arrange
         var  successResult1 = Result<string>.Success(SuccessMessage);
-        var  successResult2 = Result<string>.Failure(TestException);
+        var  successResult2 = Result<string>.Failure(TestError);
 
         // Act
         var hashCode1 = successResult1.GetHashCode();

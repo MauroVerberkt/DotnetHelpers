@@ -12,7 +12,7 @@ namespace HelperMonads.UnitTests;
 [TestFixture]
 public class ResultBindingTests
 {
-    private static Exception TestException => new(FailureMessage);
+    private static Error TestError => Error.Create(FailureMessage);
     private const string FailureMessage = "ValidData";
     private const string SuccessMessage = "Success";
     private const string NextMessage = "Next";
@@ -25,7 +25,7 @@ public class ResultBindingTests
     public void Bind_ShouldReturnResult_WhenFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var result = failureResult.Bind(() => Result<string>.Success(NextMessage));
@@ -65,7 +65,7 @@ public class ResultBindingTests
     public void BindWithData_ShouldReturnResult_WhenFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var result = failureResult.BindWithData(_ => Result<string>.Success(NextMessage));
@@ -132,7 +132,7 @@ public class ResultBindingTests
     public async Task BindWithDataAsync_ShouldReturnFailure_WhenResultIsFailure()
     {
         // Arrange
-        var result = Result<string>.Failure(TestException);
+        var result = Result<string>.Failure(TestError);
 
         // Act
         var processedResult = await result.BindWithDataAsync(ProcessData);
@@ -185,7 +185,7 @@ public class ResultBindingTests
     public async Task BindWithDataAsync_ShouldReturnFailure_WhenResultIsFailure_WithCancellationToken()
     {
         // Arrange
-        var result = Result<int>.Failure(TestException);
+        var result = Result<int>.Failure(TestError);
         var cancellationToken = CancellationToken.None;
 
         // Act
@@ -290,7 +290,7 @@ public class ResultBindingTests
     public async Task BindAsync_ShouldReturnFailure_WhenResultIsFailure()
     {
         // Arrange
-        var result = Result<string>.Failure(TestException);
+        var result = Result<string>.Failure(TestError);
 
         // Act
         var processedResult = await result.BindAsync(ProcessDataAsync);
@@ -343,7 +343,7 @@ public class ResultBindingTests
     public async Task BindAsync_ShouldReturnFailure_WhenResultIsFailure_WithCancellationToken()
     {
         // Arrange
-        var result = Result<int>.Failure(TestException);
+        var result = Result<int>.Failure(TestError);
         var cancellationToken = CancellationToken.None;
 
         // Act
@@ -424,7 +424,7 @@ public class ResultBindingTests
     public void BindAndTransform_ShouldReturnResult_WhenFailure()
     {
         // Arrange
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var result = failureResult.BindAndTransform(_ => Result<int>.Success(1));
@@ -491,7 +491,7 @@ public class ResultBindingTests
     public async Task BindAndTransformAsync_ShouldReturnFailure_WhenResultIsFailure()
     {
         // Arrange
-        var result = Result<string>.Failure(TestException);
+        var result = Result<string>.Failure(TestError);
 
         // Act
         var processedResult = await result.BindAndTransformAsync(ProcessData);
@@ -544,7 +544,7 @@ public class ResultBindingTests
     public async Task BindAndTransformAsync_ShouldReturnFailure_WhenResultIsFailure_WithCancellationToken()
     {
         // Arrange
-        var result = Result<string>.Failure(TestException);
+        var result = Result<string>.Failure(TestError);
         var cancellationToken = CancellationToken.None;
 
         // Act

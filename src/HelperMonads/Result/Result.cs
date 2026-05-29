@@ -32,10 +32,10 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     public TData? Data { get; }
 
     /// <summary>
-    /// The exception associated with a failed operation.
+    /// The error associated with a failed operation.
     /// </summary>
     [Pure]
-    public Exception? Error { get; }
+    public Error? Error { get; }
 
     private const string NoDataProvidedMessage = "Data must be provided for a successful result.";
     private const string NoErrorProvidedMessage = "Error must be provided for a failed result.";
@@ -45,12 +45,12 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// </summary>
     /// <param name="isSuccess">Indicates whether the operation was successful.</param>
     /// <param name="data">Data associated with the <see cref="Result{TData}" />.</param>
-    /// <param name="error">The exception associated with the failure, if any.</param>
+    /// <param name="error">The error associated with the failure, if any.</param>
     /// <exception cref="ArgumentNullException">
     /// Thrown when <paramref name="isSuccess" /> is true and <paramref name="data" /> is null.
     /// </exception>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    private Result(bool isSuccess, TData? data, Exception? error)
+    private Result(bool isSuccess, TData? data, Error? error)
     {
         IsSuccess = isSuccess;
 
@@ -75,7 +75,7 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
         return other != null &&
                IsSuccess == other.IsSuccess &&
                EqualityComparer<TData>.Default.Equals(Data, other.Data) &&
-               EqualityComparer<Exception>.Default.Equals(Error, other.Error);
+               EqualityComparer<Error>.Default.Equals(Error, other.Error);
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// </summary>
     /// <param name="action">The action to execute.</param>
     /// <returns>This result.</returns>
-    public Result<TData> OnFailure(Action<Exception> action)
+    public Result<TData> OnFailure(Action<Error> action)
     {
         if (IsFailure)
             action(Error);
@@ -203,7 +203,7 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// Deconstructs the result into its components for pattern matching.
     /// </summary>
     [Pure]
-    public void Deconstruct(out bool isSuccess, out TData? data, out Exception? error)
+    public void Deconstruct(out bool isSuccess, out TData? data, out Error? error)
     {
         isSuccess = IsSuccess;
         data = Data;
@@ -278,7 +278,7 @@ public class Result<TData> : IEquatable<Result<TData>> where TData : notnull
     /// </summary>
     [Pure]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal static Result<TData> Failure(Exception error)
+    internal static Result<TData> Failure(Error error)
     {
         return new Result<TData>(false, default, error);
     }
@@ -298,7 +298,7 @@ public static class Result
 
     /// <inheritdoc cref="Result{TData}.Failure" />
     [Pure]
-    public static Result<TData> Failure<TData>(Exception error) where TData : notnull
+    public static Result<TData> Failure<TData>(Error error) where TData : notnull
     {
         return Result<TData>.Failure(error);
     }

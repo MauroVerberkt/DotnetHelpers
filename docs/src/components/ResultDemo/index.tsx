@@ -8,7 +8,7 @@ interface ResultDemoProps {
 export default function ResultDemo({ title = "Result<T> Demo" }: ResultDemoProps): React.JSX.Element {
   const [isSuccess, setIsSuccess] = useState<boolean>(true);
   const [value, setValue] = useState<string>('User { Name = "John" }');
-  const [error, setError] = useState<string>('UserNotFoundException');
+  const [error, setError] = useState<string>('User not found');
 
   const toggleResult = () => {
     setIsSuccess(!isSuccess);
@@ -28,7 +28,7 @@ export default function ResultDemo({ title = "Result<T> Demo" }: ResultDemoProps
         <code>
           {isSuccess
             ? `Result.Success(${value})`
-            : `Result.Failure<User>(new ${error}())`
+            : `Result.Failure<User>(Error.Create("${error}", "NOT_FOUND"))`
           }
         </code>
       </div>

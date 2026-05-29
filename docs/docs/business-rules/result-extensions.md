@@ -197,8 +197,8 @@ public class UsersController : ControllerBase
             : BadRequest(new
             {
                 Error = result.Error.Message,
-                RuleKey = (result.Error as BusinessRuleViolationException)?.Key,
-                RuleDescription = (result.Error as BusinessRuleViolationException)?.Requirement
+                RuleKey = (result.Error.Exception as BusinessRuleViolationException)?.Key,
+                RuleDescription = (result.Error.Exception as BusinessRuleViolationException)?.Requirement
             });
     }
 }
