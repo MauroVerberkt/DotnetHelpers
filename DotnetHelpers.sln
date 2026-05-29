@@ -14,14 +14,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessRules", "BusinessRu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
 		.gitignore = .gitignore
 		Monads.slnf = Monads.slnf
 		BusinessRules.slnf = BusinessRules.slnf
 		Directory.Build.props = Directory.Build.props
 		nuget.config = nuget.config
 		Directory.Packages.props = Directory.Packages.props
-		LICENSE = LICENSE
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperMonads", "src\HelperMonads\HelperMonads.csproj", "{25C8842C-1CB9-FDDB-AF86-3E8C23BB97F4}"
@@ -59,6 +57,20 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRules.Wcf.UnitTests", "tests\BusinessRules.Wcf.UnitTests\BusinessRules.Wcf.UnitTests.csproj", "{0D7D3980-91B8-49B6-9CE6-7ED563C7BA7A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{29D12269-789D-48C1-9964-CC10B7B57C57}"
+	ProjectSection(SolutionItems) = preProject
+		tools\docs-push.ps1 = tools\docs-push.ps1
+		tools\setup.ps1 = tools\setup.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documentation", "documentation", "{68805024-391A-4332-961F-02929F33E1A0}"
+	ProjectSection(SolutionItems) = preProject
+		CONTRIBUTING.md = CONTRIBUTING.md
+		design-system-style-guide.md = design-system-style-guide.md
+		README.md = README.md
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packaging", "packaging", "{9411AB8C-5275-4DD5-AAB0-4E55A6781736}"
 	ProjectSection(SolutionItems) = preProject
 		tools\build-businessrules.ps1 = tools\build-businessrules.ps1
 		tools\build-monads.ps1 = tools\build-monads.ps1
@@ -144,6 +156,8 @@ Global
 		{3CA80CDA-DD51-413D-8CF5-E82479D08DB1} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC946}
 		{0D7D3980-91B8-49B6-9CE6-7ED563C7BA7A} = {FE8D3893-BD83-45F1-B767-9B27E590F8C0}
 
+		{68805024-391A-4332-961F-02929F33E1A0} = {8BC9CEB8-8B4A-11D0-8D11-00A0C91BC947}
+		{9411AB8C-5275-4DD5-AAB0-4E55A6781736} = {29D12269-789D-48C1-9964-CC10B7B57C57}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D9A822D7-E111-4537-A03D-1650C5BF21BF}

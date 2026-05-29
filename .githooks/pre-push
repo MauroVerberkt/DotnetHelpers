@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Enforce branch naming conventions.
+# Allowed prefixes: docs/, feat/, fix/, refactor/, chore/
+# Direct pushes to main are handled by GitHub rulesets, not this hook.
+
+branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+# Detached HEAD or main — nothing to enforce
+if [ -z "$branch" ] || [ "$branch" = "main" ]; then
+  exit 0
+fi
+
+if ! echo "$branch" | grep -qE '^(docs|feat|fix|refactor|chore)/'; then
+  echo ""
+  echo "ERROR: Branch '$branch' does not use a required prefix."
+  echo ""
+  echo "Allowed prefixes:"
+  echo "  docs/     Documentation, proposals, ADRs"
+  echo "  feat/     New features"
+  echo "  fix/      Bug fixes"
+  echo "  refactor/ Restructuring without behavior change"
+  echo "  chore/    CI, tooling, dependencies"
+  echo ""
+  echo "Example: git checkout -b feat/add-option-map"
+  echo ""
+  exit 1
+fi

@@ -99,6 +99,27 @@ revised freely until they reach "done" status.
 4. **Production-ready** — XML docs, nullable annotations, deterministic builds,
    proper packaging metadata
 
+## Git Workflow
+
+- **Always update main** before creating a new branch:
+  `git checkout main && git pull`
+- **Branch prefixes** are enforced by a `pre-push` git hook:
+  - `docs/` — Documentation, proposals, ADRs
+  - `feat/` — New features
+  - `fix/` — Bug fixes
+  - `refactor/` — Restructuring without behavior change
+  - `chore/` — CI, tooling, dependencies
+- **Commit messages** follow Conventional Commits:
+  `<type>(optional-scope): <short description>`
+- **Never push directly to main** — all changes go through PRs.
+- **`docs/` branches** get fast-tracked: push, create PR with `--fill`, set
+  `--squash --auto --delete-branch`. Use `.\tools\docs-push.ps1` for this.
+- **All other branches**: push, create PR, wait for `ci-gate` to pass, squash
+  merge.
+- **Documentation files** include: `docs/**`, `README.md`, `CONTRIBUTING.md`,
+  `LICENSE`, `CHANGELOG.md`. CI enforces that `docs/` branches only touch these
+  files.
+
 ## Don'ts
 
 - Don't add exception-based error handling to HelperMonads (use Result/Option)
