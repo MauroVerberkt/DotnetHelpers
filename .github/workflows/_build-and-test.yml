@@ -1,0 +1,108 @@
+name: Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      publish-summary:
+        description: 'Whether to generate and upload test-summary.json'
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test with coverage
+        run: |
+          dotnet test --no-build --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./test-results \
+            --logger "junit;LogFilePath=${{ github.workspace }}/test-results/junit-{assembly}.xml" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          directory: ./test-results
+          files: "**/*cobertura*.xml"
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Find JUnit test result files
+        if: ${{ !cancelled() }}
+        id: junit
+        run: echo "files=$(find ./test-results -name 'junit-*.xml' -type f | paste -sd ',' -)" >> $GITHUB_OUTPUT
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() && steps.junit.outputs.files != '' }}
+        uses: codecov/codecov-action@v6
+        with:
+          files: ${{ steps.junit.outputs.files }}
+          report_type: test_results
+          disable_search: true
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Generate test summary
+        if: inputs.publish-summary
+        run: |
+          COVERAGE_FILES=$(find ./test-results -name "coverage.cobertura.xml" -type f)
+          TOTAL_COVERAGE=0
+          FILE_COUNT=0
+          for f in $COVERAGE_FILES; do
+            LINE_RATE=$(grep -oP 'line-rate="\K[^"]+' "$f" | head -1)
+            if [ -n "$LINE_RATE" ]; then
+              TOTAL_COVERAGE=$(echo "$TOTAL_COVERAGE + $LINE_RATE" | bc)
+              FILE_COUNT=$((FILE_COUNT + 1))
+            fi
+          done
+          if [ "$FILE_COUNT" -gt 0 ]; then
+            AVG_COVERAGE=$(echo "scale=4; $TOTAL_COVERAGE / $FILE_COUNT * 100" | bc)
+          else
+            AVG_COVERAGE="0"
+          fi
+          cat <<EOF > test-summary.json
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "commit": "${{ github.sha }}",
+            "branch": "main",
+            "coverage_percent": $AVG_COVERAGE,
+            "test_projects": $FILE_COUNT,
+            "status": "pass"
+          }
+          EOF
+
+      - name: Upload test summary artifact
+        if: inputs.publish-summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-summary
+          path: test-summary.json

@@ -9,6 +9,7 @@ keywords:
   - some
   - none
   - pattern matching
+  - async
   - functional programming
 ---
 
@@ -40,6 +41,7 @@ The abstract base class with these key features:
 | `HasValue` | Indicates whether the option contains a value |
 | `Value` | The value inside the option (only accessible if `HasValue` is true) |
 | `Match<TResult>` | Apply a function based on whether a value is present or not |
+| `MatchAsync<TResult>` | Async version of `Match` (with `CancellationToken` overload) |
 
 ### `Some<TValue>`
 
@@ -132,6 +134,27 @@ string message = maybeAge.Match(
 maybeAge.Match(
     some: age => { _logger.LogInfo($"Age: {age}"); return true; },
     none: () => { _logger.LogWarning("No age found"); return false; }
+);
+```
+
+### Async Pattern Matching
+
+When your Some/None handlers need to perform async operations (database lookups, HTTP calls), use `MatchAsync`:
+
+```csharp title="MatchAsyncExamples.cs"
+Option<int> maybeUserId = GetCurrentUserId();
+
+// Basic async match
+UserProfile profile = await maybeUserId.MatchAsync(
+    some: async id => await _userService.GetProfileAsync(id),
+    none: () => Task.FromResult(UserProfile.Anonymous)
+);
+
+// With CancellationToken support
+UserProfile profile = await maybeUserId.MatchAsync(
+    some: async (id, ct) => await _userService.GetProfileAsync(id, ct),
+    none: (ct) => Task.FromResult(UserProfile.Anonymous),
+    cancellationToken
 );
 ```
 

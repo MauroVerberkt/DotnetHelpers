@@ -6,9 +6,10 @@ tags: [BusinessRules]
 
 # PROP-005: Replace BusinessRuleResolver Runtime Reflection
 
-**Status:** exploring  
+**Status:** done  
 **Size:** medium  
 **Created:** 2026-05-25  
+**Completed:** 2026-05-28  
 
 ## Problem / Motivation
 
@@ -85,4 +86,13 @@ internal static class BusinessRuleLookup
 
 ## Outcome
 
-_Pending_
+**Option A selected: Remove resolver entirely.**
+
+The `BusinessRuleResolver` was deleted along with the `Requirement` property on both attributes. Attributes are now purely declarative string-key markers. The Roslyn analyzers (BR001–BR004) already provide compile-time validation of rule keys, making runtime resolution redundant.
+
+- `BusinessRuleResolver.cs` — deleted
+- `BusinessRuleAttribute.Requirement` — removed (breaking change)
+- `ImplementsBusinessRuleAttribute.Requirement` — removed (breaking change)
+- All tests pass, zero build warnings
+
+See: [ADR-008: Remove BusinessRuleResolver Runtime Reflection](../../decisions/008-remove-business-rule-resolver.md)

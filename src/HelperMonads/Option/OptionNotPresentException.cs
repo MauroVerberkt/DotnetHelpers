@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HelperMonads.Option;
+﻿namespace HelperMonads;
 
 /// <summary>
 /// Represents an exception thrown when an option does not contain a value.

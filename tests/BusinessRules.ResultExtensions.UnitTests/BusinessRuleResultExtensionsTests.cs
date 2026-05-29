@@ -1,4 +1,4 @@
-using HelperMonads.Result;
+using HelperMonads;
 
 namespace BusinessRules.ResultExtensions.UnitTests;
 
@@ -19,7 +19,7 @@ public class BusinessRuleResultExtensionsTests
         {
             Assert.That(result.IsFailure, Is.True);
             Assert.That(result.IsSuccess, Is.False);
-            Assert.That(result.Error, Is.SameAs(exception));
+            Assert.That(result.Error?.Exception, Is.SameAs(exception));
         });
     }
 
@@ -47,10 +47,10 @@ public class BusinessRuleResultExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error, Is.InstanceOf<BusinessRuleViolationException>());
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
 
-        var brException = (BusinessRuleViolationException)result.Error;
+        var brException = (BusinessRuleViolationException)result.Error!.Exception!;
         Assert.Multiple(() =>
         {
             Assert.That(brException.Key, Is.EqualTo("TEST_USER_AGE_MIN"));
@@ -84,7 +84,7 @@ public class BusinessRuleResultExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error, Is.InstanceOf<BusinessRuleViolationException>());
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
     }
 
@@ -103,6 +103,24 @@ public class BusinessRuleResultExtensionsTests
         {
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(result.Data, Is.EqualTo(expectedValue));
+        });
+    }
+
+    [Test]
+    public void ValidateAndReturn_WithRule_WithBusinessRuleViolationException_ReturnsFailedResult()
+    {
+        // Arrange
+        var rule = new TestUserMustBeAdult();
+
+        // Act
+        var result = BusinessRuleResultExtensions.ValidateAndReturn<int>(
+            () => throw TestUserMustBeAdult.ToException(), rule);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
     }
 
@@ -152,10 +170,10 @@ public class BusinessRuleResultExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error, Is.InstanceOf<BusinessRuleViolationException>());
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
 
-        var brException = (BusinessRuleViolationException)result.Error;
+        var brException = (BusinessRuleViolationException)result.Error!.Exception!;
         Assert.That(brException.Key, Is.EqualTo("TEST_PWD_MIN_LENGTH"));
     }
 
@@ -180,6 +198,28 @@ public class BusinessRuleResultExtensionsTests
         {
             Assert.That(result.IsSuccess, Is.True);
             Assert.That(result.Data, Is.EqualTo(expectedValue));
+        });
+    }
+
+    [Test]
+    public async Task ValidateAndReturnAsync_WithRule_WithBusinessRuleViolationException_ReturnsFailedResult()
+    {
+        // Arrange
+        var rule = new TestUserMustBeAdult();
+
+        // Act
+        var result = await BusinessRuleResultExtensions.ValidateAndReturnAsync<string>(
+            async () =>
+            {
+                await Task.Delay(1);
+                throw TestUserMustBeAdult.ToException();
+            }, rule);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.IsFailure, Is.True);
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
     }
 
@@ -215,10 +255,10 @@ public class BusinessRuleResultExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error, Is.InstanceOf<BusinessRuleViolationException>());
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
 
-        var brException = (BusinessRuleViolationException)result.Error;
+        var brException = (BusinessRuleViolationException)result.Error!.Exception!;
         Assert.Multiple(() =>
         {
             Assert.That(brException.Key, Is.EqualTo("TEST_USER_AGE_MIN"));
@@ -244,10 +284,10 @@ public class BusinessRuleResultExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error, Is.InstanceOf<BusinessRuleViolationException>());
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
 
-        var brException = (BusinessRuleViolationException)result.Error;
+        var brException = (BusinessRuleViolationException)result.Error!.Exception!;
         Assert.Multiple(() =>
         {
             Assert.That(brException.Message, Is.EqualTo(customMessage));
@@ -336,10 +376,10 @@ public class BusinessRuleResultExtensionsTests
         Assert.Multiple(() =>
         {
             Assert.That(result.IsFailure, Is.True);
-            Assert.That(result.Error, Is.InstanceOf<BusinessRuleViolationException>());
+            Assert.That(result.Error?.Exception, Is.InstanceOf<BusinessRuleViolationException>());
         });
 
-        var brException = (BusinessRuleViolationException)result.Error;
+        var brException = (BusinessRuleViolationException)result.Error!.Exception!;
         Assert.That(brException.Key, Is.EqualTo("TEST_PWD_MIN_LENGTH"));
     }
 
@@ -362,7 +402,7 @@ public class BusinessRuleResultExtensionsTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var brException = (BusinessRuleViolationException)result.Error!;
+        var brException = (BusinessRuleViolationException)result.Error!.Exception!;
         Assert.That(brException.Key, Is.EqualTo("TEST_PWD_UPPERCASE"));
     }
 
@@ -384,7 +424,7 @@ public class BusinessRuleResultExtensionsTests
         // Assert
         Assert.That(result.IsFailure, Is.True);
 
-        var brException = (BusinessRuleViolationException)result.Error!;
+        var brException = (BusinessRuleViolationException)result.Error!.Exception!;
         Assert.Multiple(() =>
         {
             Assert.That(brException.Message, Is.EqualTo(customMessage));
@@ -413,7 +453,7 @@ public class BusinessRuleResultExtensionsTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            value.ValidateAll(validations!));
+            _ = value.ValidateAll(validations!));
     }
 
     [Test]
@@ -436,7 +476,7 @@ public class BusinessRuleResultExtensionsTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
-            _ = value.ValidateAll((v => true, null!)));
+            _ = value.ValidateAll((_ => true, null!)));
     }
 
     [Test]
@@ -448,7 +488,7 @@ public class BusinessRuleResultExtensionsTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() =>
-            _ = value.ValidateAll((v => true, rule, "")));
+            _ = value.ValidateAll((_ => true, rule, "")));
     }
 
     [Test]
@@ -456,7 +496,7 @@ public class BusinessRuleResultExtensionsTests
     {
         // Arrange
         var originalError = new InvalidOperationException("Original error");
-        var result = Result.Failure<string>(originalError);
+        var result = Result.Failure<string>(Error.Unexpected(originalError));
         var rule = new TestUserMustBeAdult();
 
         // Act
@@ -502,11 +542,40 @@ public class BusinessRuleResultExtensionsTests
     public void ToBusinessRuleException_WithNullRule_ThrowsArgumentNullException()
     {
         // Arrange
-        var result = Result.Failure<string>(new Exception("test"));
+        var result = Result.Failure<string>(Error.Create("test"));
         BusinessRuleBase? rule = null;
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() =>
             _ = result.ToBusinessRuleException(rule!));
+    }
+
+    [Test]
+    public void ToBusinessRuleException_WithBusinessRuleViolationError_ReturnsOriginalException()
+    {
+        // Arrange
+        var originalException = TestUserMustBeAdult.ToException();
+        var result = Result.Failure<string>(BusinessRuleResultExtensions.FromViolation(originalException));
+        var rule = new TestUserMustBeAdult();
+
+        // Act
+        var returnedException = result.ToBusinessRuleException(rule);
+
+        // Assert
+        Assert.That(returnedException, Is.SameAs(originalException));
+    }
+
+    [Test]
+    public void ToBusinessRuleException_WithErrorWithoutException_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var result = Result.Failure<string>(Error.Create("some message"));
+        var rule = new TestUserMustBeAdult();
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            _ = result.ToBusinessRuleException(rule));
+
+        Assert.That(ex.Message, Does.Contain("no inner exception present"));
     }
 }

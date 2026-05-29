@@ -1,4 +1,3 @@
-using HelperMonads.Option;
 using Moq;
 
 namespace HelperMonads.UnitTests;

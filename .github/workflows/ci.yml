@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  # Determine which paths changed to conditionally skip jobs
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'src/**'
+              - 'tests/**'
+              - '*.sln'
+              - '*.slnf'
+              - 'Directory.Build.props'
+              - 'tools/**'
+              - '.github/workflows/**'
+            docs:
+              - 'docs/**'
+
+  build-and-test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true' || github.event_name == 'push'
+    uses: ./.github/workflows/_build-and-test.yml
+    with:
+      publish-summary: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  docs-validate:
+    needs: changes
+    if: always() && (needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || github.event_name == 'push')
+    uses: ./.github/workflows/_docs-validate.yml
+
+  # Verify that docs/ branches only contain documentation file changes.
+  # Fails the PR if non-documentation files are modified on a docs/ branch.
+  docs-only-guard:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'docs/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify docs-only changes
+        run: |
+          FILES=$(gh pr view ${{ github.event.number }} --json files --jq '.files[].path')
+          echo "Changed files:"
+          echo "$FILES"
+          echo ""
+          NON_DOCS=$(echo "$FILES" | grep -vE '^docs/|^README\.md$|^CONTRIBUTING\.md$|^LICENSE$|^CHANGELOG\.md$' || true)
+          if [ -n "$NON_DOCS" ]; then
+            echo "::error::docs/ branch contains non-documentation files:"
+            echo "$NON_DOCS"
+            exit 1
+          fi
+          echo "All changes are documentation-only."
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  # Gate job: the single required status check for branch protection.
+  # Always runs, aggregates results from conditional jobs.
+  ci-gate:
+    if: always()
+    needs: [build-and-test, docs-validate, docs-only-guard]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.build-and-test.result }}" == "failure" || "${{ needs.docs-validate.result }}" == "failure" || "${{ needs.docs-only-guard.result }}" == "failure" ]]; then
+            echo "CI failed"
+            exit 1
+          fi
+          echo "CI passed (build-and-test: ${{ needs.build-and-test.result }}, docs-validate: ${{ needs.docs-validate.result }}, docs-only-guard: ${{ needs.docs-only-guard.result }})"

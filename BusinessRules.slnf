@@ -11,8 +11,7 @@
       "tests\\BusinessRules.UnitTests\\BusinessRules.UnitTests.csproj",
       "tests\\BusinessRules.ResultExtensions.UnitTests\\BusinessRules.ResultExtensions.UnitTests.csproj",
       "tests\\BusinessRules.Wcf.UnitTests\\BusinessRules.Wcf.UnitTests.csproj",
-      "tests\\BusinessRules.IntegrationTests\\BusinessRules.IntegrationTests.csproj",
-      "tools\\BusinessRules.Analyzers.Package\\BusinessRules.Analyzers.Package.csproj"
+      "tests\\BusinessRulesGenerator.UnitTests\\BusinessRulesGenerator.UnitTests.csproj"
     ]
   }
 }

@@ -1,5 +1,3 @@
-using HelperMonads.Result;
-
 namespace HelperMonads.UnitTests;
 
 /// <summary>
@@ -20,7 +18,7 @@ namespace HelperMonads.UnitTests;
 [TestFixture]
 public class ResultEqualsTests
 {
-    private static Exception TestException => new(FailureMessage);
+    private static Error TestError => Error.Create(FailureMessage);
     private const string FailureMessage = "Failed";
     private const string SuccessMessage = "Success";
     private const string NextMessage = "Next";
@@ -50,7 +48,7 @@ public class ResultEqualsTests
     {
         // Arrange
         var result1 = Result<string>.Success(SuccessMessage);
-        var result2 = Result<string>.Failure(TestException);
+        var result2 = Result<string>.Failure(TestError);
 
         // Act
         var isEqual = result1.Equals(result2);
@@ -118,7 +116,7 @@ public class ResultEqualsTests
     {
         // Arrange
         var successResult = Result<string>.Success(SuccessMessage);
-        var failureResult = Result<string>.Failure(TestException);
+        var failureResult = Result<string>.Failure(TestError);
 
         // Act
         var isEqual = successResult.Equals(failureResult);
@@ -129,16 +127,16 @@ public class ResultEqualsTests
 
     /// <summary>
     /// Tests that <see cref="Result{T}.Equals(object)" /> returns <c>true</c> when both results are failures with the same
-    /// exception.
+    /// error.
     /// </summary>
     [Test]
-    public void Equals_ShouldReturnTrue_WhenBothResultsAreFailureWithSameException()
+    public void Equals_ShouldReturnTrue_WhenBothResultsAreFailureWithSameError()
     {
-        var exception = TestException;
+        var error = TestError;
 
         // Arrange
-        var failureResult1 = Result<string>.Failure(exception);
-        var failureResult2 = Result<string>.Failure(exception);
+        var failureResult1 = Result<string>.Failure(error);
+        var failureResult2 = Result<string>.Failure(error);
 
         // Act
         var isEqual = failureResult1.Equals(failureResult2);
@@ -148,14 +146,32 @@ public class ResultEqualsTests
     }
 
     /// <summary>
-    /// Tests that <see cref="Result{T}.Equals(object)" /> returns <c>false</c> when failure results have different exceptions.
+    /// Tests that <see cref="Result{T}.Equals(object)" /> returns <c>true</c> when failure results have equal errors
+    /// (value equality via record semantics).
     /// </summary>
     [Test]
-    public void Equals_ShouldReturnFalse_WhenFailureResultsHaveDifferentExceptions()
+    public void Equals_ShouldReturnTrue_WhenFailureResultsHaveEqualErrors()
     {
         // Arrange
-        var failureResult1 = Result<string>.Failure(new Exception(FailureMessage));
-        var failureResult2 = Result<string>.Failure(TestException);
+        var failureResult1 = Result<string>.Failure(Error.Create(FailureMessage));
+        var failureResult2 = Result<string>.Failure(Error.Create(FailureMessage));
+
+        // Act
+        var isEqual = failureResult1.Equals(failureResult2);
+
+        // Assert
+        Assert.That(isEqual, Is.True);
+    }
+
+    /// <summary>
+    /// Tests that <see cref="Result{T}.Equals(object)" /> returns <c>false</c> when failure results have different errors.
+    /// </summary>
+    [Test]
+    public void Equals_ShouldReturnFalse_WhenFailureResultsHaveDifferentErrors()
+    {
+        // Arrange
+        var failureResult1 = Result<string>.Failure(Error.Create(FailureMessage, "CODE_A"));
+        var failureResult2 = Result<string>.Failure(Error.Create(FailureMessage, "CODE_B"));
 
         // Act
         var isEqual = failureResult1.Equals(failureResult2);

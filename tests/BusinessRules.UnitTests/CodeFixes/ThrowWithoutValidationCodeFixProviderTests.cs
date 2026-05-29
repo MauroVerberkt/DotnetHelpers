@@ -9,47 +9,6 @@ namespace BusinessRules.UnitTests.CodeFixes;
 public class ThrowWithoutValidationCodeFixProviderTests
 {
     [Test]
-    public async Task CodeFix_AddsAttributeWithClassName()
-    {
-        var source = """
-                     using BusinessRules;
-                     using BusinessRules.Rules.Authentication;
-
-                     public class TestClass
-                     {
-                         public void SomeMethod()
-                         {
-                             {|#0:throw UserMustBeAuthenticated.ToException();|}
-                         }
-                     }
-                     """;
-
-        var fixedSource = $$"""
-                          using BusinessRules;
-                          using BusinessRules.Rules.Authentication;
-                          using BusinessRules.Attributes;
-
-                          public class TestClass
-                          {
-                              [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
-                              public void SomeMethod()
-                              {
-                                  throw UserMustBeAuthenticated.ToException();
-                              }
-                          }
-                          """;
-
-        var expected = CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
-            .Diagnostic("BR004")
-            .WithLocation(0)
-            .WithArguments("SomeMethod")
-            .WithSeverity(DiagnosticSeverity.Warning);
-
-        await CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
-            .VerifyCodeFixWithGeneratedCodeAsync(source, fixedSource, expected);
-    }
-
-    [Test]
     public async Task CodeFix_AddsAttributeWithClassName_ToException()
     {
         var source = """
@@ -76,6 +35,88 @@ public class ThrowWithoutValidationCodeFixProviderTests
                               public void SomeMethod()
                               {
                                   throw UserMustBeAuthenticated.ToException();
+                              }
+                          }
+                          """;
+
+        var expected = CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+            .Diagnostic("BR004")
+            .WithLocation(0)
+            .WithArguments("SomeMethod")
+            .WithSeverity(DiagnosticSeverity.Warning);
+
+        await CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+            .VerifyCodeFixWithGeneratedCodeAsync(source, fixedSource, expected);
+    }
+
+    [Test]
+    public async Task CodeFix_AddsAttributeWithClassName_DifferentRuleClass()
+    {
+        var source = """
+                     using BusinessRules;
+                     using BusinessRules.Rules.Authorization;
+
+                     public class TestClass
+                     {
+                         public void ValidateAdmin()
+                         {
+                             {|#0:throw UserMustBeAdmin.ToException();|}
+                         }
+                     }
+                     """;
+
+        var fixedSource = """
+                          using BusinessRules;
+                          using BusinessRules.Rules.Authorization;
+                          using BusinessRules.Attributes;
+
+                          public class TestClass
+                          {
+                              [ImplementsBusinessRule(UserMustBeAdmin.Key)]
+                              public void ValidateAdmin()
+                              {
+                                  throw UserMustBeAdmin.ToException();
+                              }
+                          }
+                          """;
+
+        var expected = CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+            .Diagnostic("BR004")
+            .WithLocation(0)
+            .WithArguments("ValidateAdmin")
+            .WithSeverity(DiagnosticSeverity.Warning);
+
+        await CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+            .VerifyCodeFixWithGeneratedCodeAsync(source, fixedSource, expected);
+    }
+
+    [Test]
+    public async Task CodeFix_AddsAttributeWithClassName_ToExceptionWithMessage()
+    {
+        var source = """
+                     using BusinessRules;
+                     using BusinessRules.Rules.Authentication;
+
+                     public class TestClass
+                     {
+                         public void SomeMethod()
+                         {
+                             {|#0:throw UserMustBeAuthenticated.ToException("Custom message");|}
+                         }
+                     }
+                     """;
+
+        var fixedSource = """
+                          using BusinessRules;
+                          using BusinessRules.Rules.Authentication;
+                          using BusinessRules.Attributes;
+
+                          public class TestClass
+                          {
+                              [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
+                              public void SomeMethod()
+                              {
+                                  throw UserMustBeAuthenticated.ToException("Custom message");
                               }
                           }
                           """;
@@ -119,6 +160,94 @@ public class ThrowWithoutValidationCodeFixProviderTests
                               [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
                               [Obsolete]
                               public void SomeMethod()
+                              {
+                                  throw UserMustBeAuthenticated.ToException();
+                              }
+                          }
+                          """;
+
+        var expected = CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+            .Diagnostic("BR004")
+            .WithLocation(0)
+            .WithArguments("SomeMethod")
+            .WithSeverity(DiagnosticSeverity.Warning);
+
+        await CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+            .VerifyCodeFixWithGeneratedCodeAsync(source, fixedSource, expected);
+    }
+
+    [Test]
+    public async Task CodeFix_DirectConstruction_NoFixOffered()
+    {
+        // When throwing via new BusinessRuleViolationException(variable),
+        // the code fix cannot extract the rule key/class, so no fix is registered.
+        var source = """
+                     using BusinessRules;
+                     using BusinessRules.Rules.Authentication;
+
+                     public class TestClass
+                     {
+                         public void SomeMethod()
+                         {
+                             var rule = new UserMustBeAuthenticated();
+                             {|#0:throw new BusinessRuleViolationException(rule);|}
+                         }
+                     }
+                     """;
+
+        var test = new CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>.Test
+        {
+            TestCode = source.Replace("\r\n", "\n"),
+            FixedCode = source.Replace("\r\n", "\n"),
+            CodeFixTestBehaviors = Microsoft.CodeAnalysis.Testing.CodeFixTestBehaviors.SkipFixAllCheck,
+        };
+        test.TestState.Sources.Add(TestHelpers.GeneratedBusinessRules.GetAllGeneratedSources());
+        test.FixedState.Sources.Add(TestHelpers.GeneratedBusinessRules.GetAllGeneratedSources());
+        test.ExpectedDiagnostics.Add(
+            CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+                .Diagnostic("BR004")
+                .WithLocation(0)
+                .WithArguments("SomeMethod")
+                .WithSeverity(DiagnosticSeverity.Warning));
+        test.FixedState.ExpectedDiagnostics.Add(
+            CSharpCodeFixVerifier<ThrowWithoutValidationAnalyzer, ThrowWithoutValidationCodeFixProvider>
+                .Diagnostic("BR004")
+                .WithLocation(0)
+                .WithArguments("SomeMethod")
+                .WithSeverity(DiagnosticSeverity.Warning));
+        test.NumberOfIncrementalIterations = 0;
+        test.NumberOfFixAllIterations = 0;
+
+        await test.RunAsync();
+    }
+
+    [Test]
+    public async Task CodeFix_MultipleThrowsInMethod_FixesFirst()
+    {
+        var source = """
+                     using BusinessRules;
+                     using BusinessRules.Rules.Authentication;
+                     using BusinessRules.Rules.Authorization;
+
+                     public class TestClass
+                     {
+                         public void SomeMethod(bool isAdmin)
+                         {
+                             {|#0:throw UserMustBeAuthenticated.ToException();|}
+                         }
+                     }
+                     """;
+
+        var fixedSource = """
+                          using BusinessRules;
+                          using BusinessRules.Rules.Authentication;
+                          using BusinessRules.Rules.Authorization;
+                          using BusinessRules.Attributes;
+
+                          public class TestClass
+                          {
+                              [ImplementsBusinessRule(UserMustBeAuthenticated.Key)]
+                              public void SomeMethod(bool isAdmin)
                               {
                                   throw UserMustBeAuthenticated.ToException();
                               }

@@ -1,22 +1,19 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace HelperMonads.Option;
+namespace HelperMonads;
 
 /// <summary>
 /// Represents an abstract base class for an option that contains a value or is empty.
 /// </summary>
 /// <typeparam name="TValue">The type of the value, which must be a reference type (class).</typeparam>
-public abstract class Option<TValue>
+public abstract class Option<TValue> : IEquatable<Option<TValue>> where TValue : notnull
 {
     /// <summary>
     /// Gets an instance representing no value.
     /// </summary>
     [Pure]
-    public static Option<TValue> None => new None<TValue>();
+    public static Option<TValue> None { get; } = new None<TValue>();
 
     /// <summary>
     /// Gets a value indicating whether the option contains a value.
@@ -81,6 +78,31 @@ public abstract class Option<TValue>
             None<TValue> => await none(cancellationToken),
             _ => throw new OptionNotPresentException()
         };
+    }
+
+    /// <inheritdoc />
+    [Pure]
+    public bool Equals(Option<TValue>? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        if (HasValue != other.HasValue) return false;
+
+        return !HasValue || EqualityComparer<TValue>.Default.Equals(Value, other.Value);
+    }
+
+    /// <inheritdoc />
+    [Pure]
+    public override bool Equals(object? obj)
+    {
+        return obj is Option<TValue> other && Equals(other);
+    }
+
+    /// <inheritdoc />
+    [Pure]
+    public override int GetHashCode()
+    {
+        return HasValue ? HashCode.Combine(true, Value) : HashCode.Combine(false);
     }
 
     /// <inheritdoc />

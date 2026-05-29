@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace HelperMonads.Option;
+namespace HelperMonads;
 
 /// <summary>
 /// Represents an option that contains no value.
 /// </summary>
 /// <typeparam name="TValue">The type of the value, which must be a reference type (class).</typeparam>
-public sealed class None<TValue> : Option<TValue>
+public sealed class None<TValue> : Option<TValue> where TValue : notnull
 {
     /// <summary>
     /// Gets a value indicating that the option does not contain a value.
