@@ -29,3 +29,7 @@ testing:
 packaging:
   label: Packaging
   description: Relates to NuGet packaging, versioning, and distribution
+
+HelperUnions:
+  label: HelperUnions
+  description: Relates to the HelperUnions library (discriminated unions)
