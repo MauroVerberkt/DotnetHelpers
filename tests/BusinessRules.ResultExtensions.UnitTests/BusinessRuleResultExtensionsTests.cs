@@ -509,4 +509,18 @@ public class BusinessRuleResultExtensionsTests
         Assert.Throws<ArgumentNullException>(() =>
             _ = result.ToBusinessRuleException(rule!));
     }
+
+    [Test]
+    public void ToBusinessRuleException_WithErrorWithoutException_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var result = Result.Failure<string>(Error.Create("some message"));
+        var rule = new TestUserMustBeAdult();
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            _ = result.ToBusinessRuleException(rule));
+
+        Assert.That(ex.Message, Does.Contain("no inner exception present"));
+    }
 }

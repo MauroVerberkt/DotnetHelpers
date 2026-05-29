@@ -318,6 +318,13 @@ public static class BusinessRuleResultExtensions
         if (result.IsSuccess)
             throw new InvalidOperationException("Cannot convert successful result to exception");
 
-        return new BusinessRuleViolationException(rule, result.Error.Message, result.Error.Exception!);
+        return result.Error.Exception switch
+        {
+            BusinessRuleViolationException exception => exception,
+            null => throw new InvalidOperationException(
+                "Cannot convert error to BusinessRuleViolationException: no inner exception present. " +
+                "Use FromViolation() when creating errors from business rule violations."),
+            _ => new BusinessRuleViolationException(rule, result.Error.Message, result.Error.Exception)
+        };
     }
 }
