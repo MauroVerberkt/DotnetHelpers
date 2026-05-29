@@ -9,6 +9,19 @@ namespace BusinessRules.ResultExtensions;
 public static class BusinessRuleResultExtensions
 {
     /// <summary>
+    /// Creates an <see cref="Error"/> from a <see cref="BusinessRuleViolationException"/>.
+    /// Uses the rule's key as the error code and preserves the exception for logging.
+    /// </summary>
+    /// <param name="exception">The business rule violation exception.</param>
+    /// <returns>An <see cref="Error"/> with the violation message, rule key as code, and the original exception.</returns>
+    [Pure]
+    public static Error FromViolation(BusinessRuleViolationException exception)
+    {
+        ArgumentNullException.ThrowIfNull(exception);
+        return new Error(exception.Message, exception.Key, exception);
+    }
+
+    /// <summary>
     /// Converts a <see cref="BusinessRuleViolationException"/> to a failed <see cref="Result{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of the result data.</typeparam>
@@ -18,7 +31,7 @@ public static class BusinessRuleResultExtensions
     public static Result<T> ToResult<T>(this BusinessRuleViolationException exception) where T : notnull
     {
         ArgumentNullException.ThrowIfNull(exception);
-        return Result.Failure<T>(Error.Unexpected(exception));
+        return Result.Failure<T>(FromViolation(exception));
     }
 
     /// <summary>
@@ -38,7 +51,7 @@ public static class BusinessRuleResultExtensions
         ArgumentNullException.ThrowIfNull(error);
         
         var exception = new BusinessRuleViolationException(rule, error.Message, error);
-        return Result.Failure<TData>(Error.Unexpected(exception));
+        return Result.Failure<TData>(FromViolation(exception));
     }
 
     /// <summary>
@@ -62,7 +75,7 @@ public static class BusinessRuleResultExtensions
         }
         catch (BusinessRuleViolationException ex)
         {
-            return Result.Failure<T>(Error.Unexpected(ex));
+            return Result.Failure<T>(FromViolation(ex));
         }
     }
 
@@ -90,7 +103,7 @@ public static class BusinessRuleResultExtensions
         }
         catch (BusinessRuleViolationException ex)
         {
-            return Result.Failure<T>(Error.Unexpected(ex));
+            return Result.Failure<T>(FromViolation(ex));
         }
     }
 
@@ -116,7 +129,7 @@ public static class BusinessRuleResultExtensions
         }
         catch (BusinessRuleViolationException ex)
         {
-            return Result.Failure<T>(Error.Unexpected(ex));
+            return Result.Failure<T>(FromViolation(ex));
         }
     }
 
@@ -146,7 +159,7 @@ public static class BusinessRuleResultExtensions
         }
         catch (BusinessRuleViolationException ex)
         {
-            return Result.Failure<T>(Error.Unexpected(ex));
+            return Result.Failure<T>(FromViolation(ex));
         }
     }
 
@@ -174,7 +187,7 @@ public static class BusinessRuleResultExtensions
 
         return predicate(value)
             ? Result.Success(value)
-            : Result.Failure<T>(Error.Unexpected(new BusinessRuleViolationException(rule)));
+            : Result.Failure<T>(FromViolation(new BusinessRuleViolationException(rule)));
     }
 
     /// <summary>
@@ -204,7 +217,7 @@ public static class BusinessRuleResultExtensions
 
         return predicate(value)
             ? Result.Success(value)
-            : Result.Failure<T>(Error.Unexpected(new BusinessRuleViolationException(rule, errorMessage)));
+            : Result.Failure<T>(FromViolation(new BusinessRuleViolationException(rule, errorMessage)));
     }
 
     /// <summary>
@@ -238,7 +251,7 @@ public static class BusinessRuleResultExtensions
                 throw new ArgumentNullException(nameof(rule), "Rule cannot be null in validations array");
 
             if (!predicate(value))
-                return Result.Failure<T>(Error.Unexpected(new BusinessRuleViolationException(rule)));
+                return Result.Failure<T>(FromViolation(new BusinessRuleViolationException(rule)));
         }
 
         return Result.Success(value);
@@ -279,7 +292,7 @@ public static class BusinessRuleResultExtensions
                 throw new ArgumentException("Error message cannot be null or whitespace in validations array", nameof(errorMessage));
 
             if (!predicate(value))
-                return Result.Failure<T>(Error.Unexpected(new BusinessRuleViolationException(rule, errorMessage)));
+                return Result.Failure<T>(FromViolation(new BusinessRuleViolationException(rule, errorMessage)));
         }
 
         return Result.Success(value);
