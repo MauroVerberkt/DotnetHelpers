@@ -36,7 +36,7 @@ the dispatch routing, the input schema, and the tool manifest.
 |----------|------|
 | **Yard** | Generated dispatch registry. Maps operation names to handlers, provides manifest of available operations. |
 | **Operation** | A named unit of work. Declares its name, input shape, and pipeline (validate → execute). |
-| **Manifest** | Auto-generated metadata: operation name, description, JSON schema for input. Consumable as MCP tool definitions, CLI help text, or API docs. |
+| **Manifest** | Auto-generated metadata: operation name and description (v1), with JSON schema for input planned for v2. Consumable as MCP tool definitions, CLI help text, or API docs. |
 
 ## Pipeline
 
@@ -46,8 +46,8 @@ Each operation invocation flows through a railway-oriented pipeline:
 name + JSON payload
        │
        ▼
-  Resolve ──────► Option<Operation>     (name lookup — compile-time dispatch table)
-       │
+  Resolve ──────► Result<Operation>      (name lookup — compile-time dispatch table;
+       │                                   unknown name → Result.Failure with specific error)
        ▼
   Deserialize ──► Result<TInput>        (JSON → typed record)
        │
@@ -76,7 +76,7 @@ public class GreetOperation : Operation<GreetInput, GreetOutput>
             ? Result.Failure<GreetInput>(Errors.Required(nameof(input.Name)))
             : Result.Success(input);
 
-    protected override async Task<Result<GreetOutput>> Execute(GreetInput input)
+    protected override async Task<Result<GreetOutput>> Execute(GreetInput input, CancellationToken ct)
         => Result.Success(new GreetOutput($"Hello, {input.Name}!"));
 }
 
@@ -97,14 +97,17 @@ services.AddRailyard(); // Generated extension method — registers all discover
 ```csharp
 var yard = serviceProvider.GetRequiredService<IYard>();
 
-Result<string> result = await yard.DispatchAsync("greet", """{"name": "World"}""");
+Result<string> result = await yard.DispatchAsync("greet", """{"name": "World"}""", ct);
 ```
 
 ### Getting the Manifest
 
 ```csharp
 IReadOnlyList<OperationDescriptor> manifest = yard.Manifest;
-// Each descriptor: Name, Description, InputSchema (JsonSchema)
+// Each descriptor: Name, Description (v1); InputSchema added in v2
+
+// Lookup by name for pre-dispatch validation
+OperationDescriptor? descriptor = yard.TryGetDescriptor("greet");
 ```
 
 ## Source Generation Strategy
@@ -113,14 +116,30 @@ The Roslyn source generator:
 
 1. **Discovers** all classes with `[Operation]` attribute
 2. **Validates** at compile time:
-   - TInput is a record
    - Name is unique across the assembly
    - Required overrides are present
 3. **Emits:**
-   - `AddRailyard()` extension method with all DI registrations
+   - `AddRailyard()` extension method with all DI registrations (operations registered as **transient**)
    - Dispatch table (name → type mapping, no reflection at runtime)
-   - `OperationDescriptor` instances with JSON schemas derived from input records
-   - Diagnostic errors for violations (missing attribute, duplicate names, non-record input)
+   - `OperationDescriptor` instances (name + optional description in v1; JSON schemas in v2)
+   - Diagnostic errors for violations (missing attribute, duplicate names)
+
+**DI lifetime:** V1 registers all operations as transient. Per-operation lifetime
+override via attribute (e.g., `[Operation("x", Lifetime = ServiceLifetime.Scoped)]`)
+is deferred to a future version.
+
+**`Description` property:** Optional on the `[Operation]` attribute. When omitted,
+the manifest entry has a null/empty description.
+
+**Note on type constraints:** The base class constrains `where TInput : class` and
+`where TOutput : class`. Records are recommended (immutability, clean deserialization)
+but not enforced — any class that `System.Text.Json` can deserialize is valid. This
+avoids friction when consumers have existing domain types that don't fit the record shape.
+
+The `TOutput` constraint exists because operations sit at a serialization boundary.
+Bare value types as JSON root values (`42`, `true`) are technically valid but produce
+poor response shapes — wrapping in a record (`record CountOutput(int Count)`) costs
+nothing, produces clean JSON, and allows adding fields later without breaking consumers.
 
 ## Async-First Design
 
@@ -133,14 +152,14 @@ public abstract class Operation<TInput, TOutput> : IOperation
     where TInput : class
     where TOutput : class
 {
-    protected abstract Result<TInput> Validate(TInput input);
-    protected abstract Task<Result<TOutput>> Execute(TInput input);
+    protected virtual Result<TInput> Validate(TInput input) => Result.Success(input);
+    protected abstract Task<Result<TOutput>> Execute(TInput input, CancellationToken ct);
 }
 
 // Sync convenience
 public abstract class SyncOperation<TInput, TOutput> : Operation<TInput, TOutput>
 {
-    protected sealed override Task<Result<TOutput>> Execute(TInput input)
+    protected sealed override Task<Result<TOutput>> Execute(TInput input, CancellationToken ct)
         => Task.FromResult(ExecuteSync(input));
 
     protected abstract Result<TOutput> ExecuteSync(TInput input);
@@ -156,6 +175,11 @@ the JSON response string at the boundary. This gives:
 - Typed composition when operations call each other in-process
 - String serialization only at the external boundary
 
+**In-process composition:** For operations that need to invoke other operations directly,
+inject the operation via DI and call it with typed inputs — no need for a special
+"typed dispatch" API. The `IYard.DispatchAsync` boundary is for external callers
+(string in, string out). Internal callers bypass serialization entirely.
+
 ## Middleware / Behaviors (Future)
 
 Pipeline behaviors wrap operations for cross-cutting concerns:
@@ -165,7 +189,8 @@ public class TimingBehavior<TInput, TOutput> : IOperationBehavior<TInput, TOutpu
 {
     public async Task<Result<TOutput>> Handle(
         TInput input,
-        Func<Task<Result<TOutput>>> next)
+        Func<Task<Result<TOutput>>> next,
+        CancellationToken ct)
     {
         var sw = Stopwatch.StartNew();
         var result = await next();
@@ -177,6 +202,12 @@ public class TimingBehavior<TInput, TOutput> : IOperationBehavior<TInput, TOutpu
 
 Registered globally or per-operation. Generated into the pipeline at compile time or
 resolved from DI at runtime (TBD).
+
+**Stretch goal — custom pipeline shapes:** Allow consumers to define their own base
+classes with additional pipeline steps (e.g., Deserialize → Normalize → Validate →
+Execute). The generator would introspect the base class to wire up the pipeline. This
+is powerful but significantly increases generator complexity — deferred until the fixed
+pipeline proves too limiting in practice.
 
 ## Target Use Cases
 
@@ -197,19 +228,52 @@ operation handlers. Adding a new hardware action = one class.
 Message queue delivers typed jobs. Railyard provides the dispatch, validation, and
 error-handling pipeline without requiring a full framework like Hangfire or Wolverine.
 
+## Non-Goals / Out of Scope
+
+- **Not a messaging framework** — no retries, dead-letter queues, sagas, or delivery
+  guarantees. Railyard dispatches; transport is someone else's problem.
+- **Not an HTTP framework** — no routing, no ASP.NET middleware pipeline. It sits
+  *behind* whatever transport layer you use.
+- **Not a CQRS framework** — no read/write separation concepts. Operations are
+  operations; consumers can layer their own semantics on top.
+- **Not a replacement for MediatR in existing architectures** — different design goals.
+  Railyard targets serialization boundaries with compile-time generation; MediatR
+  targets in-process decoupling with runtime resolution.
+
+## Versioning Roadmap
+
+### V1 — Core Dispatch
+
+- Fixed pipeline: Deserialize → Validate → Execute → Serialize
+- Source-generated dispatch table and DI registration
+- Manifest with name + description per operation
+- Async-first with CancellationToken support
+- Single-assembly discovery
+- Serialization via System.Text.Json (no schema generation)
+- Target: .NET 8+
+
+### V2 — Schema & Behaviors
+
+- Compile-time JSON schema generation from TInput properties
+- Pipeline behaviors (cross-cutting concerns)
+- Schema available in manifest for MCP tool definitions, API docs
+
+### Future
+
+- Multi-assembly operation discovery
+- Custom pipeline shapes (custom base classes)
+- Streaming output support
+
 ## Open Questions
 
-- **Multi-assembly support** — How does the generator handle operations spread across
-  multiple assemblies? Likely: each assembly gets its own partial registry, a host
-  generator aggregates them.
 - **Output serialization** — Always JSON via System.Text.Json? Or pluggable serializers?
-- **Operation dependencies** — Can operations invoke other operations in-process
-  (typed, bypassing serialization)? If so, how does the DI scope work?
 - **Behaviors registration** — Compile-time woven vs. runtime resolved? Compile-time
   is faster but less flexible.
 - **Error taxonomy** — Should Railyard define standard error codes/categories
   (validation, not-found, unauthorized, infrastructure) or leave that to consumers?
-- **Cancellation** — `CancellationToken` threading through the async pipeline.
+- **Cancellation threading** — CancellationToken flows through Execute. Should it also
+  flow through behaviors? Through Validate? (Validate should be fast/synchronous, so
+  probably not.)
 - **Streaming** — Some operations (especially tool orchestration) may want to stream
   output. Does that fit the Result model or need a separate path?
 
