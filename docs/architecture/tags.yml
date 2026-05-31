@@ -33,3 +33,7 @@ packaging:
 HelperUnions:
   label: HelperUnions
   description: Relates to the HelperUnions library (discriminated unions)
+
+Railyard:
+  label: Railyard
+  description: Relates to the Railyard compile-time operation dispatch framework
