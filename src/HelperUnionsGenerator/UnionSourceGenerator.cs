@@ -27,7 +27,7 @@ public sealed class UnionSourceGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(unionRecords, static (productionContext, candidate) =>
         {
-            if (!candidate.HasVariants)
+            if (candidate.Variants.Count == 0)
             {
                 return;
             }
@@ -54,12 +54,14 @@ public sealed class UnionSourceGenerator : IIncrementalGenerator
             return null;
         }
 
-        var hasVariants = unionSymbol
+        var variants = unionSymbol
             .GetTypeMembers()
-            .Any(typeMember =>
+            .Where(typeMember =>
                 typeMember.IsRecord &&
                 typeMember.IsSealed &&
-                SymbolEqualityComparer.Default.Equals(typeMember.BaseType, unionSymbol));
+                SymbolEqualityComparer.Default.Equals(typeMember.BaseType, unionSymbol))
+            .Select(CreateVariant)
+            .ToList();
 
         return new UnionCandidate(
             unionSymbol.ContainingNamespace.IsGlobalNamespace
@@ -68,7 +70,7 @@ public sealed class UnionSourceGenerator : IIncrementalGenerator
             GetContainingTypeChain(unionSymbol),
             BuildRecordDeclaration(unionSymbol),
             unionSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat).Replace('<', '_').Replace('>', '_'),
-            hasVariants);
+            variants);
     }
 
     private static bool HasUnionAttribute(INamedTypeSymbol unionSymbol)
@@ -107,6 +109,11 @@ public sealed class UnionSourceGenerator : IIncrementalGenerator
         sourceBuilder.AppendLine($"{candidate.Declaration}");
         sourceBuilder.AppendLine("{");
         sourceBuilder.AppendLine("    private " + ExtractRecordName(candidate.Declaration) + "() { }");
+        sourceBuilder.AppendLine();
+
+        AppendIsProperties(sourceBuilder, candidate.Variants);
+        sourceBuilder.AppendLine();
+        AppendTryGetMethods(sourceBuilder, candidate.Variants);
         sourceBuilder.AppendLine("}");
 
         for (var i = candidate.ContainingTypeChain.Count - 1; i >= 0; i--)
@@ -115,6 +122,101 @@ public sealed class UnionSourceGenerator : IIncrementalGenerator
         }
 
         return sourceBuilder.ToString();
+    }
+
+    private static void AppendIsProperties(StringBuilder sourceBuilder, IReadOnlyList<UnionVariant> variants)
+    {
+        foreach (var variant in variants)
+        {
+            sourceBuilder.AppendLine($"    public bool Is{variant.Name} => this is {variant.Name};");
+        }
+    }
+
+    private static void AppendTryGetMethods(StringBuilder sourceBuilder, IReadOnlyList<UnionVariant> variants)
+    {
+        var methods = variants.Where(variant => variant.Parameters.Count > 0).ToList();
+        for (var i = 0; i < methods.Count; i++)
+        {
+            var variant = methods[i];
+            var outParameters = string.Join(", ",
+                variant.Parameters.Select(parameter => $"out {parameter.TypeName} {parameter.ParameterName}"));
+
+            sourceBuilder.AppendLine($"    public bool TryGet{variant.Name}({outParameters})");
+            sourceBuilder.AppendLine("    {");
+            sourceBuilder.AppendLine($"        if (this is {variant.Name} variant)");
+            sourceBuilder.AppendLine("        {");
+
+            foreach (var parameter in variant.Parameters)
+            {
+                sourceBuilder.AppendLine($"            {parameter.ParameterName} = variant.{parameter.PropertyName};");
+            }
+
+            sourceBuilder.AppendLine("            return true;");
+            sourceBuilder.AppendLine("        }");
+
+            foreach (var parameter in variant.Parameters)
+            {
+                sourceBuilder.AppendLine($"        {parameter.ParameterName} = default!;");
+            }
+
+            sourceBuilder.AppendLine("        return false;");
+            sourceBuilder.AppendLine("    }");
+
+            if (i < methods.Count - 1)
+            {
+                sourceBuilder.AppendLine();
+            }
+        }
+    }
+
+    private static UnionVariant CreateVariant(INamedTypeSymbol variantSymbol)
+    {
+        var primaryConstructor = variantSymbol.InstanceConstructors
+            .FirstOrDefault(constructor => !constructor.IsImplicitlyDeclared);
+
+        var parameters = primaryConstructor is null
+            ? []
+            : primaryConstructor.Parameters.Select(parameter =>
+                {
+                    var propertyName = ToPascalCase(parameter.Name);
+                    return new UnionVariantParameter(
+                        parameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                        ToCamelCase(parameter.Name),
+                        propertyName);
+                })
+                .ToList();
+
+        return new UnionVariant(variantSymbol.Name, parameters);
+    }
+
+    private static string ToPascalCase(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        if (char.IsUpper(input[0]))
+        {
+            return input;
+        }
+
+        return char.ToUpperInvariant(input[0]) + input.Substring(1);
+    }
+
+    private static string ToCamelCase(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        if (char.IsLower(input[0]))
+        {
+            return input;
+        }
+
+        return char.ToLowerInvariant(input[0]) + input.Substring(1);
     }
 
     private static string BuildRecordDeclaration(INamedTypeSymbol unionSymbol)
@@ -191,13 +293,13 @@ public sealed class UnionSourceGenerator : IIncrementalGenerator
             IReadOnlyList<string> containingTypeChain,
             string declaration,
             string hintName,
-            bool hasVariants)
+            IReadOnlyList<UnionVariant> variants)
         {
             Namespace = @namespace;
             ContainingTypeChain = containingTypeChain;
             Declaration = declaration;
             HintName = hintName;
-            HasVariants = hasVariants;
+            Variants = variants;
         }
 
         public string? Namespace { get; }
@@ -208,6 +310,35 @@ public sealed class UnionSourceGenerator : IIncrementalGenerator
 
         public string HintName { get; }
 
-        public bool HasVariants { get; }
+        public IReadOnlyList<UnionVariant> Variants { get; }
+    }
+
+    private sealed class UnionVariant
+    {
+        public UnionVariant(string name, IReadOnlyList<UnionVariantParameter> parameters)
+        {
+            Name = name;
+            Parameters = parameters;
+        }
+
+        public string Name { get; }
+
+        public IReadOnlyList<UnionVariantParameter> Parameters { get; }
+    }
+
+    private sealed class UnionVariantParameter
+    {
+        public UnionVariantParameter(string typeName, string parameterName, string propertyName)
+        {
+            TypeName = typeName;
+            ParameterName = parameterName;
+            PropertyName = propertyName;
+        }
+
+        public string TypeName { get; }
+
+        public string ParameterName { get; }
+
+        public string PropertyName { get; }
     }
 }

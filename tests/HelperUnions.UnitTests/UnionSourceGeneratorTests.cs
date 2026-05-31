@@ -40,7 +40,9 @@ public class UnionSourceGeneratorTests
             {
                 public sealed record Customer(string Name) : BusinessParty;
 
-                public sealed record Supplier(string CompanyName) : BusinessParty;
+                public sealed record Supplier(string CompanyName, int Rating) : BusinessParty;
+
+                public sealed record Prospect() : BusinessParty;
             }
             """;
 

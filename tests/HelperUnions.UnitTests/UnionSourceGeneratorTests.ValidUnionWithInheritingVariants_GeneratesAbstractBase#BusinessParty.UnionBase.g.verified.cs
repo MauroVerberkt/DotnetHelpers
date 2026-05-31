@@ -7,4 +7,32 @@ namespace Demo;
 public abstract partial record BusinessParty
 {
     private BusinessParty() { }
+
+    public bool IsCustomer => this is Customer;
+    public bool IsSupplier => this is Supplier;
+    public bool IsProspect => this is Prospect;
+
+    public bool TryGetCustomer(out string name)
+    {
+        if (this is Customer variant)
+        {
+            name = variant.Name;
+            return true;
+        }
+        name = default!;
+        return false;
+    }
+
+    public bool TryGetSupplier(out string companyName, out int rating)
+    {
+        if (this is Supplier variant)
+        {
+            companyName = variant.CompanyName;
+            rating = variant.Rating;
+            return true;
+        }
+        companyName = default!;
+        rating = default!;
+        return false;
+    }
 }
